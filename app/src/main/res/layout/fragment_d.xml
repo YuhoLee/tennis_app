@@ -19,25 +19,25 @@
             android:id="@+id/imageView5"
             android:layout_width="56dp"
             android:layout_height="match_parent"
-            app:srcCompat="@drawable/ic_baseline_account_circle_24"
-            android:layout_marginRight="10dp"/>
+            app:srcCompat="@drawable/ic_baseline_account_circle_24" />
 
         <TextView
             android:id="@+id/menu_name"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_height="match_parent"
             android:layout_marginRight="12dp"
+            android:gravity="center"
             android:text="이름"
             android:textSize="25dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/menu_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="이메일" />
+            android:layout_width="215dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="이메일"
+            android:textSize="17dp"/>
     </LinearLayout>
 
     <LinearLayout
