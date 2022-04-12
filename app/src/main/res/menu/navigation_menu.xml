@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/fragment_a"
+        android:enabled="true"
+        android:title="Bluetooth 연결"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_baseline_bluetooth_24" />
+
+    <item
+        android:id="@+id/fragment_b"
+        android:enabled="true"
+        android:title="조정"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_baseline_person_24"/>
+
+    <item
+        android:id="@+id/fragment_c"
+        android:enabled="true"
+        android:title="통계"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_baseline_insert_chart_24"/>
+
+    <item
+        android:id="@+id/fragment_d"
+        android:enabled="true"
+        android:title="메뉴"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_baseline_menu_24"/>
+</menu>
