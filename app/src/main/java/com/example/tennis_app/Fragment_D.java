@@ -1,10 +1,7 @@
 package com.example.tennis_app;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +32,6 @@ public class Fragment_D extends Fragment implements View.OnClickListener {
     private FirebaseUser user;
     private DatabaseReference mDatabase;
     private String uid;
-    private String uname;
-    private String uemail;
 
     @Nullable
     @Override
@@ -52,6 +47,11 @@ public class Fragment_D extends Fragment implements View.OnClickListener {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         uid = user.getUid();
 
+        mem_info.setOnClickListener(this);
+        user_management.setOnClickListener(this);
+        one_on_one.setOnClickListener(this);
+        logout.setOnClickListener(this);
+
         mDatabase.child("users").child(uid).child("name").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -63,15 +63,16 @@ public class Fragment_D extends Fragment implements View.OnClickListener {
             }
         });
 
-        mem_info.setOnClickListener(this);
-        user_management.setOnClickListener(this);
-        one_on_one.setOnClickListener(this);
-        logout.setOnClickListener(this);
-
-
-
-
-
+        mDatabase.child("users").child(uid).child("email").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String value = snapshot.getValue(String.class);
+                email.setText(value);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
 
         return v;
     }

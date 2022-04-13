@@ -28,8 +28,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.ktx.Firebase;
 
 public class Register extends AppCompatActivity {
-    private EditText name;
-    private EditText email;
+    private EditText up_name;
+    private EditText up_email;
     private EditText password1;
     private EditText password2;
     private EditText phone_number;
@@ -58,8 +58,8 @@ public class Register extends AppCompatActivity {
         setContentView(R.layout.register);
 
         mAuth = FirebaseAuth.getInstance();
-        name = findViewById(R.id.signName);
-        email = findViewById(R.id.signEmail);
+        up_name = findViewById(R.id.signName);
+        up_email = findViewById(R.id.signEmail);
         password1 = findViewById(R.id.signPassword1);
         password2 = findViewById(R.id.signPassword2);
         phone_number = findViewById(R.id.phoneNumber);
@@ -69,10 +69,10 @@ public class Register extends AppCompatActivity {
         register = findViewById(R.id.registerButton);
         pwCheck = findViewById(R.id.pwCheck);
         tf = findViewById(R.id.tfBox);
-        em = email.getText().toString();
+        em = up_email.getText().toString();
         pw1 = password1.getText().toString();
         pw2 = password2.getText().toString();
-        name_str = name.getText().toString();
+        name_str = up_name.getText().toString();
         phone = phone_number.getText().toString();
         y = year.getText().toString();
         m = month.getText().toString();
@@ -137,15 +137,15 @@ public class Register extends AppCompatActivity {
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i(TAG, "afterTextChanged: " + email.getText().toString());
+                Log.i(TAG, "afterTextChanged: " + up_email.getText().toString());
                 Log.i(TAG, "afterTextChanged: " + pw1);
                 Log.i(TAG, "afterTextChanged: " + pw2);
-                if((TextUtils.isEmpty(email.getText().toString())) || TextUtils.isEmpty(pw1) || TextUtils.isEmpty(pw2)) {
+                if((TextUtils.isEmpty(up_email.getText().toString())) || TextUtils.isEmpty(pw1) || TextUtils.isEmpty(pw2)) {
                     Toast.makeText(getApplicationContext(), "빠진 항목이 없는지 확인하세요.", Toast.LENGTH_SHORT).show();
                 }
                 else{
                     if (pw1.equals(pw2)) {
-                        createAccount(email.getText().toString(), password1.getText().toString());
+                        createAccount(up_email.getText().toString(), password1.getText().toString());
                     } else {
                         Toast.makeText(getApplicationContext(), "비밀번호가 일치하는지 확인해주세요.", Toast.LENGTH_SHORT).show();
                     }
@@ -162,12 +162,14 @@ public class Register extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             Toast.makeText(getApplicationContext(), "계정 생성 성공!",Toast.LENGTH_SHORT).show();
-                            name_str = name.getText().toString();
+                            name_str = up_name.getText().toString();
                             phone = phone_number.getText().toString();
                             y = year.getText().toString();
                             m = month.getText().toString();
                             d = day.getText().toString();
+                            em = up_email.getText().toString();
                             User user = new User();
+                            user.setEmail(em);
                             user.setName(name_str);
                             user.setPhone(phone);
                             user.setYear(y);
