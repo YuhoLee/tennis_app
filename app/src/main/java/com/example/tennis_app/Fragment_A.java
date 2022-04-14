@@ -4,9 +4,12 @@ import static android.content.ContentValues.TAG;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,8 +17,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
@@ -26,9 +32,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class Fragment_A extends Fragment {
     private static final int REQUEST_ENABLE_BT = 10; // 블루투스 활성화 상태
@@ -45,6 +57,12 @@ public class Fragment_A extends Fragment {
     private EditText editTextSend; // 송신 할 데이터를 작성하기 위한 에딧 텍스트
     private Button buttonSend; // 송신하기 위한 버튼
     private ActivityResultLauncher<String> requestPermissionLauncher;
+    private ListView listDevice;
+    private SimpleAdapter adapterDevice;
+    List<Map<String,String>> dataDevice;
+    List<BluetoothDevice> bluetoothDevices;
+    int selectDevice;
+
 
 
 
@@ -57,9 +75,18 @@ public class Fragment_A extends Fragment {
         textViewReceive = v.findViewById(R.id.textView_receive);
         editTextSend = v.findViewById(R.id.editText_send);
         buttonSend = v.findViewById(R.id.button_send);
+        listDevice = v.findViewById(R.id.listDevice);
 
         // 블루투스 활성화 하기
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); // 블루투스 어댑터를 디폴트 어댑터로 설정
+        dataDevice = new ArrayList<>();
+        adapterDevice = new SimpleAdapter(getActivity(), dataDevice, android.R.layout.simple_list_item_2, new String[]{"name", "address"}, new int[]{android.R.id.text1, android.R.id.text2});
+        listDevice.setAdapter(adapterDevice);
+        //검색된 블루투스 디바이스 데이터
+        bluetoothDevices = new ArrayList<>();
+        //선택한 디바이스 없음
+        selectDevice = -1;
+
 
         if(bluetoothAdapter == null) {   // 디바이스가 블루투스 지원하지 않을 시
         }
@@ -133,13 +160,92 @@ public class Fragment_A extends Fragment {
 
     public void selectBluetoothDevice(){
         // 이미 페어링 되어있는 블루투스 기기를 찾습니다.
+        requestPermissions(new String[]{
+                Manifest.permission.BLUETOOTH_CONNECT
+        }, 1);
         try {
             devices = bluetoothAdapter.getBondedDevices();
         }
         catch(SecurityException e){
             e.printStackTrace();
+            Log.i(TAG, "보안 예외 발생!!!");
         }
 
         // 페어링 된 디바이스의 크기를 저장
+        final int pariedDeviceCount = devices.size();
+        // 페어링 된 장치가 없는 경우
+        if(pariedDeviceCount == 0){
+            listDevice.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    BluetoothDevice device = bluetoothDevices.get(i);
+
+                    try{
+                        // 선택한 디바이스 페어링 요청
+                        Method method = device.getClass().getMethod("createBond", (Class[]) null);
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+            Log.i(TAG, "페어링 함수 호출해야해!!");
+        }
+        else {   // 페어링 된 장치가 있는 경우
+            // 디바이스 선택을 위한 다이얼로그 생성
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("페어링 되어있는 블루투스 디바이스 목록");
+            // 페어링 된 각각의 디바이스의 이름과 주소를 저장
+            List<String> list = new ArrayList<>();
+            // 모든 디바이스의 이름을 리스트에 추가
+            for(BluetoothDevice bluetoothDevice : devices){
+                try {
+                    list.add(bluetoothDevice.getName());
+                }
+                catch(SecurityException e){
+                    Log.i(TAG, "보안 예외 발생!!!");
+                }
+            }
+            list.add("취소");
+
+            // list를 CharSequence 배열로 변경
+            final CharSequence[] charSequences = list.toArray(new CharSequence[list.size()]);
+            list.toArray(new CharSequence[list.size()]);
+
+            // 해당 아이템을 눌렀을 때 호출되는 이벤트 리스너
+            builder.setItems(charSequences, new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialog, int which){
+                    // 해당 디바이스와 연결하는 함수 호출
+                    connectDevice(charSequences[which].toString());
+                }
+            });
+
+            // 뒤로가기 버튼 누를 시 창이 안닫히도록 설정
+            builder.setCancelable(false);
+            // 다이얼로그 생성
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        }
+    }
+
+    @SuppressWarnings({"MissingPermission"})
+    public void connectDevice(String deviceName){
+        // 페어링 된 디바이스들을 모두 탐색
+        for(BluetoothDevice tempDevice : devices){
+            // 사용자가 선택한 이름과 같은 디바이스로 설정하고 반복문 종료
+            if(deviceName.equals(tempDevice.getName())){
+                bluetoothDevice = tempDevice;
+                break;
+            }
+        }
+        Log.i(TAG, "connecDevices 실행!!!");
+        // UUID 생성
+        UUID uuid = java.util.UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+        // Rfcommm 채널을 통해 블루투스 디바이스와 통신하는 소켓 생성
+        try{
+            bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+        } catch(IOException e){
+            e.printStackTrace();
+        }
     }
 }
