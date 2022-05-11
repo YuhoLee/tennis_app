@@ -3,16 +3,21 @@ package com.example.tennis_app;
 import static android.content.ContentValues.TAG;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +28,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -30,6 +36,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import java.io.IOException;
@@ -59,18 +66,24 @@ public class Fragment_A extends Fragment {
     private ActivityResultLauncher<String> requestPermissionLauncher;
     private ListView listDevice;
     private SimpleAdapter adapterDevice;
-    List<Map<String,String>> dataDevice;
+    public ProgressDialog asyncDialog;
+    public boolean onBT = false;
+    List<Map<String, String>> dataDevice;
     List<BluetoothDevice> bluetoothDevices;
     int selectDevice;
 
 
-
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        checkPermission();
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_a, container, false);
-        checkPermission();
+
         // 각 컨테이너들의 id를 매인 xml과 맞춰준다.
         textViewReceive = v.findViewById(R.id.textView_receive);
         editTextSend = v.findViewById(R.id.editText_send);
@@ -87,10 +100,8 @@ public class Fragment_A extends Fragment {
         //선택한 디바이스 없음
         selectDevice = -1;
 
-
-        if(bluetoothAdapter == null) {   // 디바이스가 블루투스 지원하지 않을 시
-        }
-        else {   // 디바이스가 블루투스 지원할 시
+        if (bluetoothAdapter == null) {   // 디바이스가 블루투스 지원하지 않을 시
+        } else {   // 디바이스가 블루투스 지원할 시
             if (bluetoothAdapter.isEnabled()) {   // 블루투스가 활성화되었을 때
                 selectBluetoothDevice();    // 블루투스 디바이스 선택 함수
             } else {   // 블루투스가 비활성화일 때
@@ -104,8 +115,7 @@ public class Fragment_A extends Fragment {
                             public void onActivityResult(ActivityResult result) {
                                 if (result.getResultCode() == Activity.RESULT_OK) { // 사용 선택 시
                                     selectBluetoothDevice();    // 블루투스 디바이스 선택 함수
-                                }
-                                else{   // 취소 시
+                                } else {   // 취소 시
 
                                 }
                             }
@@ -118,15 +128,9 @@ public class Fragment_A extends Fragment {
         return v;
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-
-    }
-
-    public void checkPermission(){
-         requestPermissionLauncher =
+    public void checkPermission() {
+        requestPermissionLauncher =
                 registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                     if (isGranted) {
                         // Permission is granted. Continue the action or workflow in your
@@ -157,51 +161,56 @@ public class Fragment_A extends Fragment {
                     1);
         }
     }
+//    private String GetDevicesUUID(Context mContext){
+//        final TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+//        final String tmDevice, tmSerial, androidId;
+//        tmDevice = "" + tm.getDeviceId();
+//        tmSerial = "" + tm.getSimSerialNumber();
+//        androidId = "" + android.provider.Settings.Secure.getString(getActivity().getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+//        UUID deviceUuid = new UUID(androidId.hashCode(), ((long)tmDevice.hashCode() << 32) | tmSerial.hashCode());
+//        String deviceId = deviceUuid.toString();
+//        return deviceId;
+//    }
 
-    public void selectBluetoothDevice(){
+    public void selectBluetoothDevice() {
         // 이미 페어링 되어있는 블루투스 기기를 찾습니다.
-        requestPermissions(new String[]{
-                Manifest.permission.BLUETOOTH_CONNECT
-        }, 1);
-        try {
-            devices = bluetoothAdapter.getBondedDevices();
+
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{
+                    Manifest.permission.BLUETOOTH_CONNECT
+            }, 1);
         }
-        catch(SecurityException e){
-            e.printStackTrace();
-            Log.i(TAG, "보안 예외 발생!!!");
-        }
+        devices = bluetoothAdapter.getBondedDevices();
 
         // 페어링 된 디바이스의 크기를 저장
         final int pariedDeviceCount = devices.size();
         // 페어링 된 장치가 없는 경우
-        if(pariedDeviceCount == 0){
+        if (pariedDeviceCount == 0) {
             listDevice.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Toast.makeText(getActivity(), "먼저 Bluetooth 설정에 들어가 페어링을 진행해 주세요.", Toast.LENGTH_SHORT).show();
                     BluetoothDevice device = bluetoothDevices.get(i);
 
-                    try{
+                    try {
                         // 선택한 디바이스 페어링 요청
                         Method method = device.getClass().getMethod("createBond", (Class[]) null);
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             });
-            Log.i(TAG, "페어링 함수 호출해야해!!");
-        }
-        else {   // 페어링 된 장치가 있는 경우
+        } else {   // 페어링 된 장치가 있는 경우
             // 디바이스 선택을 위한 다이얼로그 생성
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("페어링 되어있는 블루투스 디바이스 목록");
             // 페어링 된 각각의 디바이스의 이름과 주소를 저장
             List<String> list = new ArrayList<>();
             // 모든 디바이스의 이름을 리스트에 추가
-            for(BluetoothDevice bluetoothDevice : devices){
+            for (BluetoothDevice bluetoothDevice : devices) {
                 try {
                     list.add(bluetoothDevice.getName());
-                }
-                catch(SecurityException e){
+                } catch (SecurityException e) {
                     Log.i(TAG, "보안 예외 발생!!!");
                 }
             }
@@ -212,9 +221,9 @@ public class Fragment_A extends Fragment {
             list.toArray(new CharSequence[list.size()]);
 
             // 해당 아이템을 눌렀을 때 호출되는 이벤트 리스너
-            builder.setItems(charSequences, new DialogInterface.OnClickListener(){
+            builder.setItems(charSequences, new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which){
+                public void onClick(DialogInterface dialog, int which) {
                     // 해당 디바이스와 연결하는 함수 호출
                     connectDevice(charSequences[which].toString());
                 }
@@ -228,24 +237,66 @@ public class Fragment_A extends Fragment {
         }
     }
 
-    @SuppressWarnings({"MissingPermission"})
-    public void connectDevice(String deviceName){
+    public void connectDevice(String deviceName) {
+        asyncDialog = new ProgressDialog(getContext());
+        asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        asyncDialog.setMessage("블루투스 연결중..");
+        asyncDialog.show();
+        asyncDialog.setCancelable(false);
+
         // 페어링 된 디바이스들을 모두 탐색
-        for(BluetoothDevice tempDevice : devices){
+        for (BluetoothDevice tempDevice : devices) {
             // 사용자가 선택한 이름과 같은 디바이스로 설정하고 반복문 종료
-            if(deviceName.equals(tempDevice.getName())){
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{
+                        Manifest.permission.BLUETOOTH_CONNECT
+                }, 1);
+            }
+            if (deviceName.equals(tempDevice.getName())) {
                 bluetoothDevice = tempDevice;
                 break;
             }
         }
-        Log.i(TAG, "connecDevices 실행!!!");
-        // UUID 생성
-        UUID uuid = java.util.UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-        // Rfcommm 채널을 통해 블루투스 디바이스와 통신하는 소켓 생성
-        try{
-            bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
-        } catch(IOException e){
-            e.printStackTrace();
-        }
+
+        Thread BTConnect = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"); //HC-06 UUID
+                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{
+                                Manifest.permission.BLUETOOTH_CONNECT
+                        }, 1);
+                    }
+                    bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+                    bluetoothSocket.connect();
+                    outputStream = bluetoothSocket.getOutputStream();
+                    inputStream = bluetoothSocket.getInputStream();
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @SuppressLint({"ShowToast", "SetTextI18n"})
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(),deviceName + " 연결 완료",Toast.LENGTH_LONG).show();
+                            asyncDialog.dismiss();
+                        }
+                    });
+                    onBT = true;
+                } catch(Exception e){
+                    // 블루투스 연결 중 오류 발생
+                    getActivity().runOnUiThread(new Runnable() {
+                        @SuppressLint({"ShowToast", "SetTextI18n"})
+                        @Override
+                        public void run() {
+
+                            asyncDialog.dismiss();
+                            Toast.makeText(getActivity(),"블루투스 연결 오류",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+            }
+        });
+        BTConnect.start();
     }
 }

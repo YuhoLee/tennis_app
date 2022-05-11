@@ -19,7 +19,6 @@
             android:id="@+id/imageView5"
             android:layout_width="80dp"
             android:layout_height="match_parent"
-
             app:srcCompat="@drawable/ic_baseline_account_circle_24" />
 
         <LinearLayout
