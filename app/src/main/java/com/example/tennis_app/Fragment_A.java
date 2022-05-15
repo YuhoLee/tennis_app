@@ -68,6 +68,7 @@ public class Fragment_A extends Fragment {
     private SimpleAdapter adapterDevice;
     public ProgressDialog asyncDialog;
     public boolean onBT = false;
+    public byte[] sendByte = new byte[4];
     List<Map<String, String>> dataDevice;
     List<BluetoothDevice> bluetoothDevices;
     int selectDevice;
@@ -125,7 +126,25 @@ public class Fragment_A extends Fragment {
 
             }
         }
+        buttonSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendData(editTextSend.getText().toString());
+            }
+        });
+
+
         return v;
+    }
+    void sendData(String text) {
+        // 문자열에 개행문자("\n")를 추가해줍니다.
+        text = "<" + text + ">";
+        try{
+            // 데이터 송신
+            outputStream.write(text.getBytes());
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -288,7 +307,6 @@ public class Fragment_A extends Fragment {
                         @SuppressLint({"ShowToast", "SetTextI18n"})
                         @Override
                         public void run() {
-
                             asyncDialog.dismiss();
                             Toast.makeText(getActivity(),"블루투스 연결 오류",Toast.LENGTH_SHORT).show();
                         }
@@ -299,4 +317,6 @@ public class Fragment_A extends Fragment {
         });
         BTConnect.start();
     }
+
+
 }
