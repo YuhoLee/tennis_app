@@ -44,7 +44,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="28dp"
+            android:layout_height="40dp"
             android:layout_marginTop="70dp"
             android:orientation="horizontal">
 
@@ -53,6 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginRight="2dp"
                 android:background="@drawable/button_round"
                 android:text="Top spin"
                 android:textColor="@color/black" />
@@ -64,6 +65,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/button_round"
                 android:text="slice"
+                android:layout_marginRight="2dp"
                 android:textColor="@color/black" />
 
             <androidx.appcompat.widget.AppCompatButton
@@ -78,30 +80,32 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="28dp"
+            android:layout_height="40dp"
             android:layout_marginTop="2dp"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/button7"
+                android:id="@+id/custom1_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginRight="2dp"
                 android:background="@drawable/button_round"
                 android:text="사용자 등록 1"
                 android:textColor="@color/black" />
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/button8"
+                android:id="@+id/custom2_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/button_round"
                 android:text="사용자 등록 2"
+                android:layout_marginRight="2dp"
                 android:textColor="@color/black" />
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/button9"
+                android:id="@+id/custom3_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -114,27 +118,31 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
+            android:layout_marginTop="50dp"
             android:orientation="horizontal">
 
 
             <TextView
-                android:id="@+id/up_txt"
+                android:id="@+id/top_txt"
                 android:layout_width="44dp"
                 android:layout_height="wrap_content"
                 android:text="상"
                 android:textSize="20dp" />
 
             <SeekBar
-                android:id="@+id/seekBar"
-                android:layout_width="200dp"
+                android:id="@+id/top_motor_seekBar"
+                android:layout_width="277dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:max="100"/>
 
             <EditText
-                android:id="@+id/editTextNumber"
+                android:id="@+id/top_motor_edit"
                 android:layout_width="40dp"
                 android:layout_height="wrap_content"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                android:gravity="center"
                 android:ems="10"
                 android:inputType="number" />
 
@@ -156,16 +164,20 @@
                 android:textSize="20dp" />
 
             <SeekBar
-                android:id="@+id/seekBar4"
+                android:id="@+id/btm_motor_seekBar"
                 android:layout_width="277dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:max="100"/>
 
             <EditText
-                android:id="@+id/editTextNumber2"
+                android:id="@+id/btm_motor_edit"
                 android:layout_width="40dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                android:gravity="center"
                 android:inputType="number" />
 
         </LinearLayout>
@@ -173,7 +185,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
+            android:layout_marginTop="40dp"
             android:orientation="horizontal">
 
 
@@ -185,16 +197,20 @@
                 android:textSize="20dp" />
 
             <SeekBar
-                android:id="@+id/seekBar5"
+                android:id="@+id/speed_seekBar"
                 android:layout_width="277dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:max="100"/>
 
             <EditText
-                android:id="@+id/editTextNumber3"
+                android:id="@+id/speed_edit"
                 android:layout_width="40dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                android:gravity="center"
                 android:inputType="number" />
 
 
@@ -215,16 +231,20 @@
                 android:textSize="20dp" />
 
             <SeekBar
-                android:id="@+id/seekBar7"
+                android:id="@+id/cycle_seekBar"
                 android:layout_width="277dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:max="100"/>
 
             <EditText
-                android:id="@+id/editTextNumber4"
+                android:id="@+id/cycle_edit"
                 android:layout_width="40dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                android:gravity="center"
                 android:inputType="number" />
 
         </LinearLayout>

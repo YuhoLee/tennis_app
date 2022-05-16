@@ -54,11 +54,9 @@ public class Register extends AppCompatActivity {
     private String m;
     private String d;
     private ImageView tf;
-    private String uid;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private DatabaseReference userReference;
-    private static Boolean isDict;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -83,7 +81,6 @@ public class Register extends AppCompatActivity {
         phone = phone_number.getText().toString();
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
-        isDict = false;
 
 
 
@@ -142,47 +139,9 @@ public class Register extends AppCompatActivity {
         email_check.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                isDict = false;
-                userReference = databaseReference.child("users");
-                userReference.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            String uuid = snapshot.getKey();    //문자열로 받기
-                            Log.i(TAG, "유유" + uuid);
-                            userReference.child(uuid).child("email").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                                    if (!task.isSuccessful()) { }
-                                    else {
-                                        String s = String.valueOf(task.getResult().getValue());
-                                        em = up_email.getText().toString();
-                                        if(s.equals(em)){
-                                            isDict = true;
-                                            Toast.makeText(getApplicationContext(), "아이디가 중복됩니다! ", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                }
-                            });
-                            if(isDict){
-                                break;
-                            }
-                        }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        // Getting Post failed, log a message
-                    }
-                });
-                if(isDict){
-                    Toast.makeText(getApplicationContext(), "아이디가 중복됩니다! ", Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    Toast.makeText(getApplicationContext(), "아이디가 중복되지 않습니다! ", Toast.LENGTH_SHORT).show();
-                }
+                checkIdDuplicate();
             }
         });
-
 
 
         register.setOnClickListener(new View.OnClickListener() {
@@ -203,7 +162,30 @@ public class Register extends AppCompatActivity {
                 }
             }
         });
+    }
 
+    private void checkIdDuplicate(){
+        userReference = databaseReference.child("users");
+        userReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String value = snapshot.getValue().toString();    //문자열로 받기
+                    int vidx = value.indexOf("email") + 6;
+                    String firebaseEmail = value.substring(vidx,value.length()-1);
+                    em = up_email.getText().toString();
+                    if(em.equals(firebaseEmail)){
+                        Toast.makeText(getApplicationContext(), "아이디가 중복됩니다! ", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+                Toast.makeText(getApplicationContext(), "아이디를 사용할 수 있습니다! ", Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+            }
+        });
     }
 
     private void createAccount(String email, String password){

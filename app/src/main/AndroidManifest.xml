@@ -43,5 +43,6 @@
         <activity android:name=".EditInfo"></activity>
         <activity android:name=".UserManagement"></activity>
         <activity android:name=".OneOnOne"></activity>
+        <activity android:name=".Adjust"></activity>
     </application>
 </manifest>
