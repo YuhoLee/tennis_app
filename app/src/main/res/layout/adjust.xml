@@ -134,7 +134,7 @@
                 android:layout_width="277dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:max="100"/>
+                android:max="100" />
 
             <EditText
                 android:id="@+id/top_motor_edit"
@@ -248,6 +248,11 @@
                 android:inputType="number" />
 
         </LinearLayout>
+
+        <ListView
+            android:id="@+id/paring_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 </LinearLayout>
