@@ -13,8 +13,11 @@ import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.SimpleAdapter;
@@ -38,6 +42,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -56,6 +68,9 @@ public class Fragment_B extends Fragment {
     private Button custom1_btn;
     private Button custom2_btn;
     private Button custom3_btn;
+    private ImageButton custom_del1;
+    private ImageButton custom_del2;
+    private ImageButton custom_del3;
     private SeekBar top_seekbar;
     private SeekBar btm_seekbar;
     private SeekBar speed_seekbar;
@@ -68,6 +83,9 @@ public class Fragment_B extends Fragment {
     private String btm_data;
     private String speed_data;
     private String cycle_data;
+    private String custom1 = "Null";
+    private String custom2 = "Null";
+    private String custom3 = "Null";
     private static final int REQUEST_ENABLE_BT = 10; // 블루투스 활성화 상태
     private BluetoothAdapter bluetoothAdapter; // 블루투스 어댑터
     private Set<BluetoothDevice> devices; // 블루투스 디바이스 데이터 셋
@@ -90,10 +108,16 @@ public class Fragment_B extends Fragment {
     List<Map<String, String>> dataDevice;
     List<BluetoothDevice> bluetoothDevices;
     int selectDevice;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference databaseReference;
+    private FirebaseUser user;
+    private String uid;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -101,6 +125,7 @@ public class Fragment_B extends Fragment {
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
 
     }
 
@@ -114,6 +139,9 @@ public class Fragment_B extends Fragment {
         custom1_btn = v.findViewById(R.id.custom1_btn);
         custom2_btn = v.findViewById(R.id.custom2_btn);
         custom3_btn = v.findViewById(R.id.custom3_btn);
+        custom_del1 = v.findViewById(R.id.custom_del1);
+        custom_del2 = v.findViewById(R.id.custom_del2);
+        custom_del3 = v.findViewById(R.id.custom_del3);
         top_seekbar = v.findViewById(R.id.top_motor_seekBar);
         btm_seekbar = v.findViewById(R.id.btm_motor_seekBar);
         speed_seekbar = v.findViewById(R.id.speed_seekBar);
@@ -124,10 +152,32 @@ public class Fragment_B extends Fragment {
         cycle_edit = v.findViewById(R.id.cycle_edit);
         listDevice = v.findViewById(R.id.paring_list);
 
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference();
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        uid = user.getUid();
+
         top_edit.setText("0");
         btm_edit.setText("0");
         speed_edit.setText("0");
         cycle_edit.setText("0");
+
+        customInit("1");
+        customInit("2");
+        customInit("3");
+
+        editTextListener(top_edit);
+        editTextListener(btm_edit);
+        editTextListener(speed_edit);
+        editTextListener(cycle_edit);
+
+        customButtonClick(custom1_btn, "1");
+        customButtonClick(custom2_btn, "2");
+        customButtonClick(custom3_btn, "3");
+
+        deleteButtonClick(custom_del1, "1");
+        deleteButtonClick(custom_del2, "2");
+        deleteButtonClick(custom_del3, "3");
 
         remoteSeekbar(top_seekbar, top_edit);
         remoteSeekbar(btm_seekbar, btm_edit);
@@ -176,6 +226,88 @@ public class Fragment_B extends Fragment {
         return v;
     }
 
+    public void editTextListener(EditText edit){
+        edit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                int v = Integer.parseInt(edit.getText().toString());
+                switch(edit.getId()){
+                    case R.id.top_motor_edit:
+                        top_seekbar.setProgress(v);
+                        break;
+                    case R.id.btm_motor_edit:
+                        btm_seekbar.setProgress(v);
+                        break;
+                    case R.id.speed_edit:
+                        speed_seekbar.setProgress(v);
+                        break;
+                    case R.id.cycle_edit:
+                        cycle_seekbar.setProgress(v);
+                        break;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+    }
+    public void customInit(String n){
+        databaseReference.child("users").child(uid).child("custom"+n).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                String s = task.getResult().getValue().toString();
+                switch(n){
+                    case "1":
+                        custom1 = s;
+                        if(!s.equals("Null")){
+                            custom1_btn.setBackgroundResource(R.drawable.greenbutton);
+                            custom_del1.setVisibility(View.VISIBLE);
+                            custom_del1.setEnabled(true);
+                        }
+                        else{
+                            custom1_btn.setBackgroundResource(R.drawable.button_round);
+                            custom_del1.setVisibility(View.INVISIBLE);
+                            custom_del1.setEnabled(false);
+                        }
+                        break;
+                    case "2":
+                        custom2 = s;
+                        if(!s.equals("Null")){
+                            custom2_btn.setBackgroundResource(R.drawable.greenbutton);
+                            custom_del2.setVisibility(View.VISIBLE);
+                            custom_del2.setEnabled(true);
+                        }
+                        else{
+                            custom2_btn.setBackgroundResource(R.drawable.button_round);
+                            custom_del2.setVisibility(View.INVISIBLE);
+                            custom_del2.setEnabled(false);
+                        }
+                        break;
+                    case "3":
+                        custom3 = s;
+                        if(!s.equals("Null")){
+                            custom3_btn.setBackgroundResource(R.drawable.greenbutton);
+                            custom_del3.setVisibility(View.VISIBLE);
+                            custom_del3.setEnabled(true);
+                        }
+                        else{
+                            custom3_btn.setBackgroundResource(R.drawable.button_round);
+                            custom_del3.setVisibility(View.INVISIBLE);
+                            custom_del3.setEnabled(false);
+                        }
+                        break;
+                }
+                Log.i(TAG, "CustomInit 실행 // " + custom1 + ", " + custom2 + ", " + custom3);
+            }
+        });
+    }
 
     public void remoteSeekbar(SeekBar seekBarComponent, EditText editText) {
         seekBarComponent.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -202,6 +334,90 @@ public class Fragment_B extends Fragment {
         });
     }
 
+    public void inputSeekbar(String[] strArr){
+        Log.i(TAG, "배열" + strArr[0] + ", " + strArr[1] + ", " + strArr[2] + ", " + strArr[3]);
+        top_edit.setText(strArr[0]);
+        btm_edit.setText(strArr[1]);
+        speed_edit.setText(strArr[2]);
+        cycle_edit.setText(strArr[3]);
+    }
+
+    public void customButtonClick(Button button, String n){
+        button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Log.i(TAG, "before btn: " + custom1 + ", " + custom2 + ", " + custom3);
+                String custom = "Null";
+                switch(n){
+                    case "1":
+                        custom = custom1;
+                        break;
+                    case "2":
+                        custom = custom2;
+                        break;
+                    case "3":
+                        custom = custom3;
+                        break;
+                }
+                if(!custom.equals("Null")){
+                    String[] strArr = custom.split(", ");
+                    inputSeekbar(strArr);
+                }
+                else{
+                    String custom_str = top_edit.getText().toString() + ", " + btm_edit.getText().toString() + ", " + speed_edit.getText().toString() + ", " + cycle_edit.getText().toString();
+                    switch (button.getId()){
+                        case R.id.custom1_btn:
+                            custom1 = custom_str;
+                            custom_del1.setVisibility(View.VISIBLE);
+                            custom_del1.setEnabled(true);
+                            break;
+                        case R.id.custom2_btn:
+                            custom2 = custom_str;
+                            custom_del2.setVisibility(View.VISIBLE);
+                            custom_del2.setEnabled(true);
+                            break;
+                        case R.id.custom3_btn:
+                            custom3 = custom_str;
+                            custom_del3.setVisibility(View.VISIBLE);
+                            custom_del3.setEnabled(true);
+                            break;
+                    }
+                    databaseReference.child("users").child(uid).child("custom"+n).setValue(custom_str);
+                    button.setBackgroundResource(R.drawable.greenbutton);
+                }
+                Log.i(TAG, "after btn: " + custom1 + ", " + custom2 + ", " + custom3);
+            }
+
+        });
+    }
+
+    public void deleteButtonClick(ImageButton button, String n){
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                databaseReference.child("users").child(uid).child("custom"+n).setValue("Null");
+                switch(n){
+                    case "1":
+                        custom1 = "Null";
+                        custom1_btn.setBackgroundResource(R.drawable.button_round);
+                        break;
+                    case "2":
+                        custom2 = "Null";
+                        custom2_btn.setBackgroundResource(R.drawable.button_round);
+                        break;
+                    case "3":
+                        custom3 = "Null";
+                        custom3_btn.setBackgroundResource(R.drawable.button_round);
+                        break;
+                }
+                button.setVisibility(View.INVISIBLE);
+                button.setEnabled(false);
+            }
+        });
+    }
+
+
+    // 블루투스 관련
     public Boolean PairingBluetoothListState() {
         try {
             if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
@@ -411,6 +627,5 @@ public class Fragment_B extends Fragment {
         });
         BTConnect.start();
     }
-
 
 }

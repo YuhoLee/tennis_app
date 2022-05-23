@@ -3,31 +3,38 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/drawable-v24/button_round.xml" value="0.243" />
-        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/drawable-v24/greenbutton.xml" value="0.3305" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/drawable-v24/button_round.xml" value="0.2275" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/drawable-v24/greenbutton.xml" value="0.2275" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2275" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/drawable-v24/is_baseline_check_circle_24_black.xml" value="0.2275" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/drawable-v24/selector_switch.xml" value="0.2275" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/drawable-v24/shape_for_circle_button.xml" value="0.2465" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/drawable-v24/shape_switch_thumb.xml" value="0.2275" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/drawable/ic_baseline_account_circle_24.xml" value="0.2275" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/drawable/ic_baseline_check_circle_24.xml" value="0.2275" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/drawable/ic_baseline_supervised_user_circle_24.xml" value="0.2275" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/drawable/menu_shape_margin.xml" value="0.2275" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/layout/adjust.xml" value="0.36614583333333334" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/layout/fragment_a.xml" value="0.36614583333333334" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/layout/fragment_b.xml" value="0.2717391304347826" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/layout/fragment_d.xml" value="0.25" />
+        <entry key="..\:/Users/LeeYuho/AndroidStudioProjects/tennis_app/app/src/main/res/layout/register.xml" value="0.17806484295845998" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.3465" />
-        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/drawable-v24/shape_switch_track_off.xml" value="0.3305" />
-        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/drawable/ic_baseline_account_circle_24.xml" value="0.3165" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/drawable/ic_baseline_arrow_forward_ios_24.xml" value="0.36" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/drawable/ic_baseline_bluetooth_24.xml" value="0.36" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/drawable/ic_baseline_cancel_24.xml" value="0.487" />
-        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/drawable/ic_baseline_menu_24.xml" value="0.3305" />
-        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/drawable/ic_baseline_supervised_user_circle_24.xml" value="0.3305" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/drawable/menu_select_color.xml" value="0.3575" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/drawable/menu_shape_margin.xml" value="0.3465" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/activity_main.xml" value="0.2692502532928065" />
-        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/adjust.xml" value="0.384963768115942" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/bluetooth.xml" value="0.31354166666666666" />
-        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/fragment_a.xml" value="0.5" />
+        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/fragment_a.xml" value="0.1" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/fragment_b.xml" value="0.35625" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/fragment_c.xml" value="0.35625" />
-        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/fragment_d.xml" value="0.22" />
+        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/fragment_d.xml" value="0.35625" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/login.xml" value="0.31354166666666666" />
-        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/login2.xml" value="0.5541666666666667" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/mem_info_edit.xml" value="0.31354166666666666" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/one_on_one.xml" value="0.31354166666666666" />
-        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/poweron_pitch.xml" value="0.328125" />
-        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/register.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/register.xml" value="0.31354166666666666" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/layout/user_management.xml" value="0.31354166666666666" />
         <entry key="..\:/Users/cdcde/AndroidStudioProjects/tennis_app/app/src/main/res/menu/navigation_menu.xml" value="0.3333333333333333" />
       </map>

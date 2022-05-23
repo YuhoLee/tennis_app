@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">tennis_app</string>
+
+    <style name="SeekBarColor" parent="Widget.AppCompat.SeekBar"> <item name="colorAccent">#76AF74</item> </style>
 </resources>

@@ -46,7 +46,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity implements SendEventListener{
+public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT = 10; // 블루투스 활성화 상태
     private BluetoothAdapter bluetoothAdapter; // 블루투스 어댑터
     private Set<BluetoothDevice> devices; // 블루투스 디바이스 데이터 셋
@@ -119,10 +119,6 @@ public class MainActivity extends AppCompatActivity implements SendEventListener
                 }
             }
         });
-    }
-    @Override
-    public void sendMessage(String message){
-        sendData(message);
     }
 
     static void sendData(String text) {

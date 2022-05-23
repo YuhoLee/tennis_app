@@ -209,6 +209,9 @@ public class Register extends AppCompatActivity {
                             user.setYear(y);
                             user.setMonth(m);
                             user.setDay(d);
+                            user.setCustom1("Null");
+                            user.setCustom2("Null");
+                            user.setCustom3("Null");
 
                             final String uid = task.getResult().getUser().getUid();
                             databaseReference.child("users").child(uid).setValue(user);
