@@ -38,11 +38,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity"
+            android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".Register"></activity>
         <activity android:name=".EditInfo"></activity>
         <activity android:name=".UserManagement"></activity>
         <activity android:name=".OneOnOne"></activity>
         <activity android:name=".Adjust"></activity>
+
     </application>
 </manifest>

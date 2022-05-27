@@ -52,7 +52,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:gravity="center"
-                android:text="Email"
+                android:text="이메일"
                 android:textSize="20sp" />
 
             <EditText
@@ -63,7 +63,8 @@
                 android:ems="10"
                 android:gravity="center"
                 android:inputType="textPersonName"
-                android:hint="Enter your E-mail"
+                android:hint="이메일을 입력해주세요."
+                android:backgroundTint="@color/black"
                 />
         </LinearLayout>
 
@@ -79,8 +80,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:gravity="center"
-                android:text="Password"
-                android:textSize="20sp"/>
+                android:text="비밀번호"
+                android:textSize="20sp" />
 
             <EditText
                 android:id="@+id/password"
@@ -90,16 +91,43 @@
                 android:ems="10"
                 android:gravity="center"
                 android:inputType="textPassword"
-                android:hint="Enter your Password"
+                android:hint="비밀번호를 입력해주세요."
+                android:backgroundTint="@color/black"
                 />
         </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="60dp">
+
+        <CheckBox
+            android:id="@+id/checkBox_autologin"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginRight="30dp"
+            android:buttonTint="#000000"
+            android:text="자동 로그인" />
+
+        <CheckBox
+            android:id="@+id/checkBox_saveId"
+            android:layout_marginLeft="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:buttonTint="#000000"
+            android:text="아이디 저장"
+            />
+
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:orientation="horizontal"
-        android:layout_marginTop="40dp">
+        android:layout_marginTop="30dp">
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/loginButton"
@@ -126,7 +154,7 @@
             android:layout_height="match_parent"
             android:layout_weight="4"
             android:gravity="center"
-            android:text="Forgot Email or Password?"
+            android:text="비밀번호 찾기"
             android:textColor="#2196F3"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -137,7 +165,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:gravity="center"
-            android:text="Wanna Register?"
+            android:text="회원가입"
             android:textColor="#2196F3"
             android:textSize="14sp"
             android:textStyle="bold" />

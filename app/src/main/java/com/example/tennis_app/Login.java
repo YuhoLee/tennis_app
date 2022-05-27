@@ -1,11 +1,14 @@
 package com.example.tennis_app;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,23 +30,50 @@ public class Login extends AppCompatActivity {
     private Button login_btn;
     private TextView forgot;
     private TextView register;
+    private CheckBox checkbox_auto_login;
+    private CheckBox checkbox_saved_id;
 
     private String email;
     private String password;
     private Intent intent;
+
+    private SharedPreferences auto_login;
+    private SharedPreferences.Editor editor;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
 
+        auto_login = getSharedPreferences("auto_login",0);
+        editor = auto_login.edit();
         mAuth = FirebaseAuth.getInstance();
         email_txt = findViewById(R.id.email);
         password_txt = findViewById(R.id.password);
         login_btn = findViewById(R.id.loginButton);
         forgot = findViewById(R.id.registerClick);
         register = findViewById(R.id.registerClick);
+        checkbox_auto_login = findViewById(R.id.checkBox_autologin);
+        checkbox_saved_id = findViewById(R.id.checkBox_saveId);
         intent = new Intent(this, com.example.tennis_app.Register.class);
+
+
+
+
+        checkbox_auto_login.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // TODO Auto-generated method stub
+                if(isChecked){
+                    editor.putBoolean("Auto_Login_enabled", true);
+                    editor.commit();
+                }else{
+                    editor.clear();
+                    editor.commit();
+                }
+            }
+        });
 
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,6 +108,13 @@ public class Login extends AppCompatActivity {
             }
         });
 
+        if(auto_login.getBoolean("Auto_Login_enabled", false)){
+            email_txt.setText(auto_login.getString("email", ""));
+            password_txt.setText(auto_login.getString("password", ""));
+            checkbox_auto_login.setChecked(true);
+            login_btn.performClick();
+        }
+
 
     }
 
@@ -90,6 +127,15 @@ public class Login extends AppCompatActivity {
                         if((task.isSuccessful())){
                             // 로그인에 성공하면 유저 정보와 함께 UI 업데이트
                             Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT).show();
+                            if(checkbox_auto_login.isChecked()){
+                                String EMAIL = email_txt.getText().toString();
+                                String PASSWORD = password_txt.getText().toString();
+
+                                editor.putString("email", EMAIL);
+                                editor.putString("password", PASSWORD);
+                                editor.putBoolean("Auto_Login_enabled", true);
+                                editor.commit();
+                            }
                             FirebaseUser user = mAuth.getCurrentUser();
                             updateUI(user);
                             email_txt.setText("");

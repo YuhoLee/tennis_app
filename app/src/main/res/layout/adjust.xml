@@ -1,324 +1,327 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="20dp">
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="right"
-            android:background="@drawable/shape_for_circle_button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </LinearLayout>
-
-    <SeekBar
-        android:id="@+id/seekBar6"
+        android:id="@+id/adjust_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="POWER"
-            android:textSize="42dp"
-            android:layout_marginTop="20dp"
-
-            />
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/powerswitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:checked="true"
-            android:thumb="@drawable/shape_switch_thumb"
-            app:switchMinWidth="102dp"
-            app:track="@drawable/selector_switch"
-            android:layout_marginTop="20dp"
-
-            />
+        android:orientation="vertical"
+        android:layout_margin="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/topspin_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:layout_marginRight="2dp"
-                android:background="@drawable/button_round"
-                android:text="Top spin"
-                android:textColor="@color/black" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/slice_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:background="@drawable/button_round"
-                android:text="slice"
-                android:layout_marginRight="2dp"
-                android:textColor="@color/black" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/random_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:background="@drawable/button_round"
-                android:text="random"
-                android:textColor="@color/black" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:orientation="horizontal">
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/custom1_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:layout_marginRight="2dp"
-                android:background="@drawable/button_round"
-                android:text="사용자 등록 1"
-                android:textColor="@color/black" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/custom2_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:background="@drawable/button_round"
-                android:text="사용자 등록 2"
-                android:layout_marginRight="2dp"
-                android:textColor="@color/black" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/custom3_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:background="@drawable/button_round"
-                android:text="사용자 등록 3"
-                android:textColor="@color/black" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="27dp"
-            android:layout_marginTop="5dp"
-            android:orientation="horizontal">
-
-            <ImageButton
-                android:id="@+id/custom_del1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="40dp"
-                android:layout_marginLeft="40dp"
-                android:layout_weight="1"
-                android:background="#00ff0000"
-                android:visibility="invisible"
-                app:srcCompat="@drawable/ic_baseline_delete_24" />
-
-            <ImageButton
-                android:id="@+id/custom_del2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="40dp"
-                android:layout_marginLeft="40dp"
-                android:layout_weight="1"
-                android:background="#00ff0000"
-                android:visibility="invisible"
-                app:srcCompat="@drawable/ic_baseline_delete_24" />
-
-            <ImageButton
-                android:id="@+id/custom_del3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="40dp"
-                android:layout_marginLeft="40dp"
-                android:layout_weight="1"
-                android:background="#00ff0000"
-                android:visibility="invisible"
-                app:srcCompat="@drawable/ic_baseline_delete_24" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:orientation="horizontal">
-
-
-            <TextView
-                android:id="@+id/top_txt"
-                android:layout_width="44dp"
-                android:layout_height="wrap_content"
-                android:text="상"
-                android:textSize="20dp" />
-
-            <SeekBar
-                android:id="@+id/top_motor_seekBar"
-                android:layout_width="300dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:max="100"
-                android:theme="@style/SeekBarColor"/>
-
-            <EditText
-                android:id="@+id/top_motor_edit"
-                android:layout_width="40dp"
-                android:layout_height="wrap_content"
-                android:textSize="15dp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:ems="10"
-                android:inputType="number" />
-
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="right"
+                android:background="@drawable/shape_for_circle_button"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="horizontal">
-
-
-            <TextView
-                android:id="@+id/btm_txt"
-                android:layout_width="44dp"
-                android:layout_height="wrap_content"
-                android:text="하"
-                android:textSize="20dp" />
-
-            <SeekBar
-                android:id="@+id/btm_motor_seekBar"
-                android:layout_width="300dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:max="100"
-                android:theme="@style/SeekBarColor"/>
-
-            <EditText
-                android:id="@+id/btm_motor_edit"
-                android:layout_width="40dp"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:textSize="15dp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:inputType="number" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:orientation="horizontal">
-
-
-            <TextView
-                android:id="@+id/speed_txt"
-                android:layout_width="44dp"
-                android:layout_height="wrap_content"
-                android:text="속도"
-                android:textSize="20dp" />
-
-            <SeekBar
-                android:id="@+id/speed_seekBar"
-                android:layout_width="300dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:max="100"
-                android:theme="@style/SeekBarColor"/>
-
-            <EditText
-                android:id="@+id/speed_edit"
-                android:layout_width="40dp"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:textSize="15dp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:inputType="number" />
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="horizontal">
-
-
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="44dp"
-                android:layout_height="wrap_content"
-                android:text="주기"
-                android:textSize="20dp" />
-
-            <SeekBar
-                android:id="@+id/cycle_seekBar"
-                style="@style/Widget.AppCompat.SeekBar.Discrete"
-                android:layout_width="300dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:max="5"
-                android:theme="@style/SeekBarColor"/>
-
-            <EditText
-                android:id="@+id/cycle_edit"
-                android:layout_width="40dp"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:textSize="15dp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:inputType="number" />
-
-        </LinearLayout>
-
-        <ListView
-            android:id="@+id/paring_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"></LinearLayout>
+            android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="POWER"
+                android:textSize="42dp"
+                android:layout_marginTop="20dp"
+
+                />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/powerswitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:checked="true"
+                android:thumb="@drawable/shape_switch_thumb"
+                app:switchMinWidth="102dp"
+                app:track="@drawable/selector_switch"
+                android:layout_marginTop="20dp"
+
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="70dp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/topspin_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:layout_marginRight="4dp"
+                    android:background="@drawable/button_round"
+                    android:text="Top spin"
+                    android:textColor="@color/black" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/slice_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_round"
+                    android:text="slice"
+                    android:layout_marginRight="4dp"
+                    android:textColor="@color/black" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/random_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_round"
+                    android:text="random"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/custom1_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_round2"
+                    android:text="+"
+                    android:textColor="@color/black"
+                    android:textSize="14dp" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/custom2_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_round2"
+                    android:text="+"
+                    android:textColor="@color/black"
+                    android:textSize="14dp" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/custom3_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_round2"
+                    android:text="+"
+                    android:textColor="@color/black"
+                    android:textSize="14dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="27dp"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/custom_del1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="40dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_weight="1"
+                    android:background="#00ff0000"
+                    android:visibility="invisible"
+                    app:srcCompat="@drawable/ic_baseline_delete_24" />
+
+                <ImageButton
+                    android:id="@+id/custom_del2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="40dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_weight="1"
+                    android:background="#00ff0000"
+                    android:visibility="invisible"
+                    app:srcCompat="@drawable/ic_baseline_delete_24" />
+
+                <ImageButton
+                    android:id="@+id/custom_del3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="40dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_weight="1"
+                    android:background="#00ff0000"
+                    android:visibility="invisible"
+                    app:srcCompat="@drawable/ic_baseline_delete_24" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:orientation="horizontal">
+
+
+                <TextView
+                    android:id="@+id/top_txt"
+                    android:layout_width="44dp"
+                    android:layout_height="wrap_content"
+                    android:text="상"
+                    android:textSize="20dp" />
+
+                <SeekBar
+                    android:id="@+id/top_motor_seekBar"
+                    android:layout_width="300dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:max="100"
+                    android:theme="@style/SeekBarColor"/>
+
+                <EditText
+                    android:id="@+id/top_motor_edit"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:ems="10"
+                    android:inputType="number" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+
+                <TextView
+                    android:id="@+id/btm_txt"
+                    android:layout_width="44dp"
+                    android:layout_height="wrap_content"
+                    android:text="하"
+                    android:textSize="20dp" />
+
+                <SeekBar
+                    android:id="@+id/btm_motor_seekBar"
+                    android:layout_width="300dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:max="100"
+                    android:theme="@style/SeekBarColor"/>
+
+                <EditText
+                    android:id="@+id/btm_motor_edit"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:inputType="number" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:orientation="horizontal">
+
+
+                <TextView
+                    android:id="@+id/speed_txt"
+                    android:layout_width="44dp"
+                    android:layout_height="wrap_content"
+                    android:text="속도"
+                    android:textSize="20dp" />
+
+                <SeekBar
+                    android:id="@+id/speed_seekBar"
+                    android:layout_width="300dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:max="100"
+                    android:theme="@style/SeekBarColor"/>
+
+                <EditText
+                    android:id="@+id/speed_edit"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:inputType="number" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+
+                <TextView
+                    android:id="@+id/textView5"
+                    android:layout_width="44dp"
+                    android:layout_height="wrap_content"
+                    android:text="주기"
+                    android:textSize="20dp" />
+
+                <SeekBar
+                    android:id="@+id/cycle_seekBar"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="300dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:max="5"
+                    android:theme="@style/SeekBarColor"/>
+
+                <EditText
+                    android:id="@+id/cycle_edit"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:inputType="number" />
+
+            </LinearLayout>
+
+            <ListView
+                android:id="@+id/paring_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"></LinearLayout>
+
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</ScrollView>

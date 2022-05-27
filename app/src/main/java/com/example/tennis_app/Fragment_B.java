@@ -10,18 +10,22 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -79,6 +83,7 @@ public class Fragment_B extends Fragment {
     private EditText btm_edit;
     private EditText speed_edit;
     private EditText cycle_edit;
+    private View layout;
     private String top_data;
     private String btm_data;
     private String speed_data;
@@ -151,6 +156,7 @@ public class Fragment_B extends Fragment {
         speed_edit = v.findViewById(R.id.speed_edit);
         cycle_edit = v.findViewById(R.id.cycle_edit);
         listDevice = v.findViewById(R.id.paring_list);
+        layout = v.findViewById(R.id.adjust_layout);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
@@ -194,6 +200,15 @@ public class Fragment_B extends Fragment {
         //선택한 디바이스 없음
         selectDevice = -1;
 
+        layout.setOnTouchListener(new View.OnTouchListener(){
+            @Override
+            public boolean onTouch(View v, MotionEvent event){
+                hideKeyboard();
+                return false;
+            }
+        });
+
+
         if (bluetoothAdapter == null) {   // 디바이스가 블루투스 지원하지 않을 시
         } else {   // 디바이스가 블루투스 지원할 시
             if (bluetoothAdapter.isEnabled()) {   // 블루투스가 활성화되었을 때
@@ -225,7 +240,15 @@ public class Fragment_B extends Fragment {
 
         return v;
     }
-
+    private void hideKeyboard()
+    {
+        if (getActivity() != null && getActivity().getCurrentFocus() != null)
+        {
+            // 프래그먼트기 때문에 getActivity() 사용
+            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
     public void editTextListener(EditText edit){
         edit.addTextChangedListener(new TextWatcher() {
             @Override
@@ -235,7 +258,14 @@ public class Fragment_B extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                int v = Integer.parseInt(edit.getText().toString());
+                edit.setSelection(edit.length());
+                int v;
+                try {
+                    v = Integer.parseInt(edit.getText().toString());
+                }
+                catch(Exception e){
+                    v = 0;
+                }
                 switch(edit.getId()){
                     case R.id.top_motor_edit:
                         top_seekbar.setProgress(v);
@@ -263,16 +293,19 @@ public class Fragment_B extends Fragment {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 String s = task.getResult().getValue().toString();
+                String[] str = s.split(", ");
                 switch(n){
                     case "1":
                         custom1 = s;
                         if(!s.equals("Null")){
                             custom1_btn.setBackgroundResource(R.drawable.greenbutton);
+                            custom1_btn.setText(str[0]);
+                            custom1_btn.setTypeface(Typeface.DEFAULT);
                             custom_del1.setVisibility(View.VISIBLE);
                             custom_del1.setEnabled(true);
                         }
                         else{
-                            custom1_btn.setBackgroundResource(R.drawable.button_round);
+                            custom1_btn.setBackgroundResource(R.drawable.button_round2);
                             custom_del1.setVisibility(View.INVISIBLE);
                             custom_del1.setEnabled(false);
                         }
@@ -281,11 +314,13 @@ public class Fragment_B extends Fragment {
                         custom2 = s;
                         if(!s.equals("Null")){
                             custom2_btn.setBackgroundResource(R.drawable.greenbutton);
+                            custom2_btn.setText(str[0]);
+                            custom2_btn.setTypeface(Typeface.DEFAULT);
                             custom_del2.setVisibility(View.VISIBLE);
                             custom_del2.setEnabled(true);
                         }
                         else{
-                            custom2_btn.setBackgroundResource(R.drawable.button_round);
+                            custom2_btn.setBackgroundResource(R.drawable.button_round2);
                             custom_del2.setVisibility(View.INVISIBLE);
                             custom_del2.setEnabled(false);
                         }
@@ -294,11 +329,13 @@ public class Fragment_B extends Fragment {
                         custom3 = s;
                         if(!s.equals("Null")){
                             custom3_btn.setBackgroundResource(R.drawable.greenbutton);
+                            custom3_btn.setText(str[0]);
+                            custom3_btn.setTypeface(Typeface.DEFAULT);
                             custom_del3.setVisibility(View.VISIBLE);
                             custom_del3.setEnabled(true);
                         }
                         else{
-                            custom3_btn.setBackgroundResource(R.drawable.button_round);
+                            custom3_btn.setBackgroundResource(R.drawable.button_round2);
                             custom_del3.setVisibility(View.INVISIBLE);
                             custom_del3.setEnabled(false);
                         }
@@ -335,11 +372,10 @@ public class Fragment_B extends Fragment {
     }
 
     public void inputSeekbar(String[] strArr){
-        Log.i(TAG, "배열" + strArr[0] + ", " + strArr[1] + ", " + strArr[2] + ", " + strArr[3]);
-        top_edit.setText(strArr[0]);
-        btm_edit.setText(strArr[1]);
-        speed_edit.setText(strArr[2]);
-        cycle_edit.setText(strArr[3]);
+        top_edit.setText(strArr[1]);
+        btm_edit.setText(strArr[2]);
+        speed_edit.setText(strArr[3]);
+        cycle_edit.setText(strArr[4]);
     }
 
     public void customButtonClick(Button button, String n){
@@ -362,28 +398,61 @@ public class Fragment_B extends Fragment {
                 if(!custom.equals("Null")){
                     String[] strArr = custom.split(", ");
                     inputSeekbar(strArr);
+                    sendData(custom);
+                    switch(button.getId()){
+                        case R.id.custom1_btn:
+
+                    }
                 }
                 else{
-                    String custom_str = top_edit.getText().toString() + ", " + btm_edit.getText().toString() + ", " + speed_edit.getText().toString() + ", " + cycle_edit.getText().toString();
-                    switch (button.getId()){
-                        case R.id.custom1_btn:
-                            custom1 = custom_str;
-                            custom_del1.setVisibility(View.VISIBLE);
-                            custom_del1.setEnabled(true);
-                            break;
-                        case R.id.custom2_btn:
-                            custom2 = custom_str;
-                            custom_del2.setVisibility(View.VISIBLE);
-                            custom_del2.setEnabled(true);
-                            break;
-                        case R.id.custom3_btn:
-                            custom3 = custom_str;
-                            custom_del3.setVisibility(View.VISIBLE);
-                            custom_del3.setEnabled(true);
-                            break;
-                    }
-                    databaseReference.child("users").child(uid).child("custom"+n).setValue(custom_str);
-                    button.setBackgroundResource(R.drawable.greenbutton);
+                    final EditText etEdit = new EditText(getActivity());
+                    etEdit.setOnKeyListener(new View.OnKeyListener() {
+                        @Override
+                        public boolean onKey(View v, int keyCode, KeyEvent event) {
+                            if (keyCode == event.KEYCODE_ENTER)
+                                return true;
+                            return false;
+                        }
+                    });
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+                    dialog.setTitle("프리셋 이름 설정");
+                    dialog.setView(etEdit);
+                    dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            String custom_name = etEdit.getText().toString();
+                            button.setText(custom_name);
+                            button.setTypeface(Typeface.DEFAULT);
+                            button.setTextSize(18);
+                            String custom_str = custom_name + ", " + top_edit.getText().toString() + ", " + btm_edit.getText().toString() + ", " + speed_edit.getText().toString() + ", " + cycle_edit.getText().toString();
+                            switch (button.getId()){
+                                case R.id.custom1_btn:
+                                    custom1 = custom_str;
+                                    custom_del1.setVisibility(View.VISIBLE);
+                                    custom_del1.setEnabled(true);
+                                    break;
+                                case R.id.custom2_btn:
+                                    custom2 = custom_str;
+                                    custom_del2.setVisibility(View.VISIBLE);
+                                    custom_del2.setEnabled(true);
+                                    break;
+                                case R.id.custom3_btn:
+                                    custom3 = custom_str;
+                                    custom_del3.setVisibility(View.VISIBLE);
+                                    custom_del3.setEnabled(true);
+                                    break;
+                            }
+                            databaseReference.child("users").child(uid).child("custom"+n).setValue(custom_str);
+                            button.setBackgroundResource(R.drawable.button_round);
+                        }
+                    });
+                    dialog.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    dialog.show();
+
+
                 }
                 Log.i(TAG, "after btn: " + custom1 + ", " + custom2 + ", " + custom3);
             }
@@ -399,15 +468,18 @@ public class Fragment_B extends Fragment {
                 switch(n){
                     case "1":
                         custom1 = "Null";
-                        custom1_btn.setBackgroundResource(R.drawable.button_round);
+                        custom1_btn.setBackgroundResource(R.drawable.button_round2);
+                        custom1_btn.setText("+");
                         break;
                     case "2":
                         custom2 = "Null";
-                        custom2_btn.setBackgroundResource(R.drawable.button_round);
+                        custom2_btn.setBackgroundResource(R.drawable.button_round2);
+                        custom2_btn.setText("+");
                         break;
                     case "3":
                         custom3 = "Null";
-                        custom3_btn.setBackgroundResource(R.drawable.button_round);
+                        custom3_btn.setBackgroundResource(R.drawable.button_round2);
+                        custom3_btn.setText("+");
                         break;
                 }
                 button.setVisibility(View.INVISIBLE);
