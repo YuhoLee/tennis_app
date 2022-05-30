@@ -43,6 +43,7 @@ public class Fragment_C extends Fragment {
     private Button weekButton;
     private Button monthButton;
     private Button yearButton;
+    private TextView train_txt;
     private Calendar cal;
     private SimpleDateFormat dateFormat;
     private FirebaseDatabase firebaseDatabase;
@@ -83,6 +84,7 @@ public class Fragment_C extends Fragment {
         weekButton = v.findViewById(R.id.week_button);
         monthButton = v.findViewById(R.id.month_button);
         yearButton = v.findViewById(R.id.year_button);
+        train_txt = v.findViewById(R.id.train_txt);
 
         buttonClick(weekButton);
         buttonClick(monthButton);
@@ -101,9 +103,11 @@ public class Fragment_C extends Fragment {
                 }
                 switch(button.getId()){
                     case R.id.week_button:
+                        train_txt.setText("주간 훈련 통계량");
                         setWeekTrain();
                         break;
                     case R.id.month_button:
+                        train_txt.setText("월간 훈련 통계량");
                         setMonthTrain();
                         break;
                     case R.id.year_button:

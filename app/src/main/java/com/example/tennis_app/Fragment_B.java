@@ -129,12 +129,14 @@ public class Fragment_B extends Fragment {
     private FirebaseUser user;
     private String uid;
     Boolean power = false;
-    Boolean inHuman = true;
     Random rnd = new Random();
     private double ball_count = 0.5;
     private int MAXSPEED = 20;
     Thread randomThread;
     Boolean isRandomStart = false;
+    Boolean custom1Start = false;
+    Boolean custom2Start = false;
+    Boolean custom3Start = false;
 
 
     @Override
@@ -301,7 +303,7 @@ public class Fragment_B extends Fragment {
             @Override
             public void run() {
                 while(true) {
-                    if (power && inHuman) {
+                    if (power) {
                         if(!top_edit.getText().toString().equals("0") && !btm_edit.getText().toString().equals("0") && !speed_edit.getText().toString().equals("0") ){
                             String s = cycle_edit.getText().toString();
                             double d = 0.1 / Double.parseDouble(s);
@@ -335,13 +337,14 @@ public class Fragment_B extends Fragment {
                     sendData(data);
                 }
                 else{
+                    isRandomStart = false;
                     power = false;
                     top_edit.setText("0");
                     btm_edit.setText("0");
                     speed_edit.setText("0");
                     cycle_edit.setText("7");
                     updateCountBall();
-                    sendData("0, 0, 0, 7");
+                    sendData("0,0,0,7");
 
                     Log.i(TAG, "setSwitchCompat ㅎㅎ");
                     Log.i(TAG, "Count: " + String.valueOf(ball_count));
@@ -456,6 +459,7 @@ public class Fragment_B extends Fragment {
         });
     }
 
+
     public void remoteSeekbar(SeekBar seekBarComponent, EditText editText) {
         seekBarComponent.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -466,7 +470,7 @@ public class Fragment_B extends Fragment {
                 speed_data = speed_edit.getText().toString();
                 cycle_data = cycle_edit.getText().toString();
                 String data = top_data + ", " + btm_data + ", " + speed_data + ", " + cycle_data;
-                if(power && inHuman) {
+                if(power) {
                     sendData(data);
                     Log.i(TAG, "데이터 목록 확인(seekbar)" + data);
                 }
@@ -505,27 +509,55 @@ public class Fragment_B extends Fragment {
                         break;
                     case R.id.random_btn:
                         Log.i(TAG, "random 눌림");
-                        isRandomStart = true;
-                        randomThread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                while(isRandomStart){
-                                    String t = String.valueOf(rnd.nextInt(100) + 1);
-                                    String b = String.valueOf(rnd.nextInt(100) + 1);
-                                    String s = String.valueOf(rnd.nextInt(MAXSPEED) + 1);
-                                    String c = String.valueOf(rnd.nextInt(5) + 2);
-                                    sendData(t+", "+b+", "+s+", "+c);
-                                    Log.i(TAG, "random: "+t+", "+b+", "+s+", "+c);
-                                    try {
-                                        Thread.sleep(Integer.parseInt(c) * 1000);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
+                        if (isRandomStart){
+                            button.setBackgroundResource(R.drawable.button_round);
+                            top_seekbar.setEnabled(true);
+                            btm_seekbar.setEnabled(true);
+                            speed_seekbar.setEnabled(true);
+                            cycle_seekbar.setEnabled(true);
+                            top_edit.setEnabled(true);
+                            btm_edit.setEnabled(true);
+                            speed_edit.setEnabled(true);
+                            cycle_edit.setEnabled(true);
+                            isRandomStart = false;
+                            top_edit.setText("0");
+                            btm_edit.setText("0");
+                            speed_edit.setText("0");
+                            cycle_edit.setText("7");
+                            sendData("0, 0, 0, 7");
+                        }
+                        else{
+                            button.setBackgroundResource(R.drawable.greenbutton);
+                            isRandomStart = true;
+                            top_seekbar.setEnabled(false);
+                            btm_seekbar.setEnabled(false);
+                            speed_seekbar.setEnabled(false);
+                            cycle_seekbar.setEnabled(false);
+                            top_edit.setEnabled(false);
+                            btm_edit.setEnabled(false);
+                            speed_edit.setEnabled(false);
+                            cycle_edit.setEnabled(false);
+                            randomThread = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    while(isRandomStart){
+                                        String t = String.valueOf(rnd.nextInt(96) + 5);
+                                        String b = String.valueOf(rnd.nextInt(96) + 5);
+                                        String s = String.valueOf(rnd.nextInt(MAXSPEED) + 1);
+                                        String c = String.valueOf(rnd.nextInt(5) + 2);
+                                        sendData(t+", "+b+", "+s+", "+c);
+                                        Log.i(TAG, "random: "+t+", "+b+", "+s+", "+c);
+                                        try {
+                                            Thread.sleep(Integer.parseInt(c) * 1000);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
-                                }
 
-                            }
-                        });
-                        randomThread.start();
+                                }
+                            });
+                            randomThread.start();
+                        }
                         break;
                 }
             }
@@ -536,7 +568,6 @@ public class Fragment_B extends Fragment {
         button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                isRandomStart = false;
                 Log.i(TAG, "before btn: " + custom1 + ", " + custom2 + ", " + custom3);
                 String custom = "Null";
                 switch(n){
@@ -551,6 +582,7 @@ public class Fragment_B extends Fragment {
                         break;
                 }
                 if(!custom.equals("Null")){
+                    isRandomStart = false;
                     String[] strArr = custom.split(", ");
                     inputSeekbar(strArr);
                     switch(button.getId()){
@@ -604,12 +636,9 @@ public class Fragment_B extends Fragment {
                         }
                     });
                     dialog.show();
-
-
                 }
                 Log.i(TAG, "after btn: " + custom1 + ", " + custom2 + ", " + custom3);
             }
-
         });
     }
 
@@ -671,64 +700,6 @@ public class Fragment_B extends Fragment {
             throw new IllegalStateException(e);
         }
     }
-
-    public void receiveData(){
-        final Handler handler = new Handler();
-        //데이터를 수신하기 위한 버퍼 생성
-        readBufferPosition = 0;
-        readBuffer = new byte[1024];
-
-        //데이터를 수신하기 위한 쓰레드 생성
-        workerThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(Thread.currentThread().isInterrupted()){
-                    try{
-                        // 데이터를 수신했는지 확인
-                        int byteAvailable = inputStream.available();
-                        // 데이터가 수신 된 경우
-                        if(byteAvailable > 0){
-                            // 입력 스트림에서 바이트 단위로 읽어옴
-                            byte[] bytes = new byte[byteAvailable];
-                            inputStream.read(bytes);
-                            // 입력 스트림 바이트를 한 바이트씩 읽어옴
-                            for(int i = 0; i < byteAvailable; i++){
-                                byte tempByte = bytes[i];
-                                // 개행문자를 기준으로 받음(한줄)
-                                if(tempByte == '\n'){
-                                    // readBuffer 배열을 encodedBytes로 복사
-                                    byte[] encodedBytes = new byte[readBufferPosition];
-                                    System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
-                                    // 인코딩 된 바이트 배열을 문자열로 변환
-                                    final String text = new String(encodedBytes, "US-ASCII");
-                                    readBufferPosition = 0;
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if(text.equals("true") && !inHuman){
-                                                inHuman = true;
-                                            }
-                                            if(text.equals("false") && inHuman){
-                                                inHuman = false;
-                                                updateCountBall();
-                                            }
-                                        }
-                                    });
-                                } // 개행문자 아닌 경우
-                                else{
-                                    readBuffer[readBufferPosition++] = tempByte;
-                                }
-                            }
-                        }
-                    } catch(IOException e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        workerThread.start();
-    }
-
 
     public void sendData(String text) {
         // 문자열에 개행문자("\n")를 추가해줍니다.
