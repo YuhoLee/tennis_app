@@ -50,7 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:checked="true"
+                android:checked="false"
                 android:thumb="@drawable/shape_switch_thumb"
                 app:switchMinWidth="102dp"
                 app:track="@drawable/selector_switch"
@@ -293,11 +293,12 @@
 
                 <SeekBar
                     android:id="@+id/cycle_seekBar"
-                    style="@style/Widget.AppCompat.SeekBar.Discrete"
                     android:layout_width="300dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:max="5"
+                    android:min="2"
+                    android:max="7"
+                    android:progress="7"
                     android:theme="@style/SeekBarColor"/>
 
                 <EditText

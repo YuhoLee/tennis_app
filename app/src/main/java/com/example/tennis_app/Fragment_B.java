@@ -17,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -28,6 +29,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -43,6 +45,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -55,12 +58,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -68,7 +78,7 @@ public class Fragment_B extends Fragment {
     private SwitchCompat sw;
     private Button topspin_btn;
     private Button slice_btn;
-    private Button random;
+    private Button random_btn;
     private Button custom1_btn;
     private Button custom2_btn;
     private Button custom3_btn;
@@ -83,6 +93,7 @@ public class Fragment_B extends Fragment {
     private EditText btm_edit;
     private EditText speed_edit;
     private EditText cycle_edit;
+    private SwitchCompat switchCompat;
     private View layout;
     private String top_data;
     private String btm_data;
@@ -117,12 +128,18 @@ public class Fragment_B extends Fragment {
     private DatabaseReference databaseReference;
     private FirebaseUser user;
     private String uid;
+    Boolean power = false;
+    Boolean inHuman = true;
+    Random rnd = new Random();
+    private double ball_count = 0.5;
+    private int MAXSPEED = 20;
+    Thread randomThread;
+    Boolean isRandomStart = false;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -140,7 +157,7 @@ public class Fragment_B extends Fragment {
         View v = inflater.inflate(R.layout.adjust, container, false);
         topspin_btn = v.findViewById(R.id.topspin_btn);
         slice_btn = v.findViewById(R.id.slice_btn);
-        random = v.findViewById(R.id.random_btn);
+        random_btn = v.findViewById(R.id.random_btn);
         custom1_btn = v.findViewById(R.id.custom1_btn);
         custom2_btn = v.findViewById(R.id.custom2_btn);
         custom3_btn = v.findViewById(R.id.custom3_btn);
@@ -157,6 +174,7 @@ public class Fragment_B extends Fragment {
         cycle_edit = v.findViewById(R.id.cycle_edit);
         listDevice = v.findViewById(R.id.paring_list);
         layout = v.findViewById(R.id.adjust_layout);
+        switchCompat = v.findViewById(R.id.powerswitch);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
@@ -166,16 +184,23 @@ public class Fragment_B extends Fragment {
         top_edit.setText("0");
         btm_edit.setText("0");
         speed_edit.setText("0");
-        cycle_edit.setText("0");
+        cycle_edit.setText("7");
 
         customInit("1");
         customInit("2");
         customInit("3");
 
+        setSwitchCompat();
+        countFiredBall();
+
         editTextListener(top_edit);
         editTextListener(btm_edit);
         editTextListener(speed_edit);
         editTextListener(cycle_edit);
+
+        fixedButtonClick(topspin_btn);
+        fixedButtonClick(slice_btn);
+        fixedButtonClick(random_btn);
 
         customButtonClick(custom1_btn, "1");
         customButtonClick(custom2_btn, "2");
@@ -190,15 +215,6 @@ public class Fragment_B extends Fragment {
         remoteSeekbar(speed_seekbar, speed_edit);
         remoteSeekbar(cycle_seekbar, cycle_edit);
 
-        // 블루투스 활성화 하기
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); // 블루투스 어댑터를 디폴트 어댑터로 설정
-        dataDevice = new ArrayList<>();
-        adapterDevice = new SimpleAdapter(getActivity(), dataDevice, android.R.layout.simple_list_item_2, new String[]{"name", "address"}, new int[]{android.R.id.text1, android.R.id.text2});
-        listDevice.setAdapter(adapterDevice);
-        //검색된 블루투스 디바이스 데이터
-        bluetoothDevices = new ArrayList<>();
-        //선택한 디바이스 없음
-        selectDevice = -1;
 
         layout.setOnTouchListener(new View.OnTouchListener(){
             @Override
@@ -208,6 +224,15 @@ public class Fragment_B extends Fragment {
             }
         });
 
+        // 블루투스 활성화 하기
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); // 블루투스 어댑터를 디폴트 어댑터로 설정
+        dataDevice = new ArrayList<>();
+        adapterDevice = new SimpleAdapter(getActivity(), dataDevice, android.R.layout.simple_list_item_2, new String[]{"name", "address"}, new int[]{android.R.id.text1, android.R.id.text2});
+        listDevice.setAdapter(adapterDevice);
+        //검색된 블루투스 디바이스 데이터
+        bluetoothDevices = new ArrayList<>();
+        //선택한 디바이스 없음
+        selectDevice = -1;
 
         if (bluetoothAdapter == null) {   // 디바이스가 블루투스 지원하지 않을 시
         } else {   // 디바이스가 블루투스 지원할 시
@@ -240,6 +265,91 @@ public class Fragment_B extends Fragment {
 
         return v;
     }
+
+
+
+    public void updateCountBall(){
+        SimpleDateFormat dtf = new SimpleDateFormat("yyyyMMdd");
+        Calendar calendar = Calendar.getInstance();
+        Date dateObj = calendar.getTime();
+        String formattedDate = dtf.format(dateObj);
+        String cnt_str = String.valueOf((int)ball_count);
+        databaseReference.child("users").child(uid).child("ballCount").child(formattedDate).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if(!task.isSuccessful()){
+                }
+                else{
+                    String res = String.valueOf(task.getResult().getValue());
+                    if(res.equals("null")){
+                        databaseReference.child("users").child(uid).child("ballCount").child(formattedDate).setValue(cnt_str);
+                    }
+                    else{
+                        Log.i(TAG, "테스크: " + String.valueOf(task.getResult().getValue()));
+                        int res_cnt = Integer.parseInt(String.valueOf(task.getResult().getValue()));
+                        res_cnt += (int)ball_count;
+                        databaseReference.child("users").child(uid).child("ballCount").child(formattedDate).setValue(String.valueOf(res_cnt));
+                    }
+                }
+                ball_count = 0.5;
+            }
+        });
+    }
+
+    public void countFiredBall(){
+        Thread countWorker = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    if (power && inHuman) {
+                        if(!top_edit.getText().toString().equals("0") && !btm_edit.getText().toString().equals("0") && !speed_edit.getText().toString().equals("0") ){
+                            String s = cycle_edit.getText().toString();
+                            double d = 0.1 / Double.parseDouble(s);
+                            ball_count += d;
+                            Log.i(TAG, "볼카운트: " + String.valueOf(ball_count) + " / 주기: " + s + " / 증가율: " + String.valueOf(d));
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                Log.i(TAG, "예외 발생!!!");
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        countWorker.start();
+    }
+
+    public void setSwitchCompat(){
+        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b) {
+                    power = true;
+                    top_data = top_edit.getText().toString();
+                    btm_data = btm_edit.getText().toString();
+                    speed_data = speed_edit.getText().toString();
+                    cycle_data = cycle_edit.getText().toString();
+                    String data = top_data + ", " + btm_data + ", " + speed_data + ", " + cycle_data;
+                    sendData(data);
+                }
+                else{
+                    power = false;
+                    top_edit.setText("0");
+                    btm_edit.setText("0");
+                    speed_edit.setText("0");
+                    cycle_edit.setText("7");
+                    updateCountBall();
+                    sendData("0, 0, 0, 7");
+
+                    Log.i(TAG, "setSwitchCompat ㅎㅎ");
+                    Log.i(TAG, "Count: " + String.valueOf(ball_count));
+                }
+            }
+        });
+    }
+
     private void hideKeyboard()
     {
         if (getActivity() != null && getActivity().getCurrentFocus() != null)
@@ -355,8 +465,11 @@ public class Fragment_B extends Fragment {
                 btm_data = btm_edit.getText().toString();
                 speed_data = speed_edit.getText().toString();
                 cycle_data = cycle_edit.getText().toString();
-                String data = top_data + "," + btm_data + "," + speed_data + "," + cycle_data;
-                sendData(data);
+                String data = top_data + ", " + btm_data + ", " + speed_data + ", " + cycle_data;
+                if(power && inHuman) {
+                    sendData(data);
+                    Log.i(TAG, "데이터 목록 확인(seekbar)" + data);
+                }
             }
 
             @Override
@@ -378,10 +491,52 @@ public class Fragment_B extends Fragment {
         cycle_edit.setText(strArr[4]);
     }
 
+    public void fixedButtonClick(Button button){
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(power)
+                switch(button.getId()){
+                    case R.id.topspin_btn:
+                        isRandomStart = false;
+                        break;
+                    case R.id.slice_btn:
+                        isRandomStart = false;
+                        break;
+                    case R.id.random_btn:
+                        Log.i(TAG, "random 눌림");
+                        isRandomStart = true;
+                        randomThread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                while(isRandomStart){
+                                    String t = String.valueOf(rnd.nextInt(100) + 1);
+                                    String b = String.valueOf(rnd.nextInt(100) + 1);
+                                    String s = String.valueOf(rnd.nextInt(MAXSPEED) + 1);
+                                    String c = String.valueOf(rnd.nextInt(5) + 2);
+                                    sendData(t+", "+b+", "+s+", "+c);
+                                    Log.i(TAG, "random: "+t+", "+b+", "+s+", "+c);
+                                    try {
+                                        Thread.sleep(Integer.parseInt(c) * 1000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                            }
+                        });
+                        randomThread.start();
+                        break;
+                }
+            }
+        });
+    }
+
     public void customButtonClick(Button button, String n){
         button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                isRandomStart = false;
                 Log.i(TAG, "before btn: " + custom1 + ", " + custom2 + ", " + custom3);
                 String custom = "Null";
                 switch(n){
@@ -398,7 +553,6 @@ public class Fragment_B extends Fragment {
                 if(!custom.equals("Null")){
                     String[] strArr = custom.split(", ");
                     inputSeekbar(strArr);
-                    sendData(custom);
                     switch(button.getId()){
                         case R.id.custom1_btn:
 
@@ -422,7 +576,6 @@ public class Fragment_B extends Fragment {
                             String custom_name = etEdit.getText().toString();
                             button.setText(custom_name);
                             button.setTypeface(Typeface.DEFAULT);
-                            button.setTextSize(18);
                             String custom_str = custom_name + ", " + top_edit.getText().toString() + ", " + btm_edit.getText().toString() + ", " + speed_edit.getText().toString() + ", " + cycle_edit.getText().toString();
                             switch (button.getId()){
                                 case R.id.custom1_btn:
@@ -519,7 +672,65 @@ public class Fragment_B extends Fragment {
         }
     }
 
-    void sendData(String text) {
+    public void receiveData(){
+        final Handler handler = new Handler();
+        //데이터를 수신하기 위한 버퍼 생성
+        readBufferPosition = 0;
+        readBuffer = new byte[1024];
+
+        //데이터를 수신하기 위한 쓰레드 생성
+        workerThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(Thread.currentThread().isInterrupted()){
+                    try{
+                        // 데이터를 수신했는지 확인
+                        int byteAvailable = inputStream.available();
+                        // 데이터가 수신 된 경우
+                        if(byteAvailable > 0){
+                            // 입력 스트림에서 바이트 단위로 읽어옴
+                            byte[] bytes = new byte[byteAvailable];
+                            inputStream.read(bytes);
+                            // 입력 스트림 바이트를 한 바이트씩 읽어옴
+                            for(int i = 0; i < byteAvailable; i++){
+                                byte tempByte = bytes[i];
+                                // 개행문자를 기준으로 받음(한줄)
+                                if(tempByte == '\n'){
+                                    // readBuffer 배열을 encodedBytes로 복사
+                                    byte[] encodedBytes = new byte[readBufferPosition];
+                                    System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
+                                    // 인코딩 된 바이트 배열을 문자열로 변환
+                                    final String text = new String(encodedBytes, "US-ASCII");
+                                    readBufferPosition = 0;
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if(text.equals("true") && !inHuman){
+                                                inHuman = true;
+                                            }
+                                            if(text.equals("false") && inHuman){
+                                                inHuman = false;
+                                                updateCountBall();
+                                            }
+                                        }
+                                    });
+                                } // 개행문자 아닌 경우
+                                else{
+                                    readBuffer[readBufferPosition++] = tempByte;
+                                }
+                            }
+                        }
+                    } catch(IOException e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        workerThread.start();
+    }
+
+
+    public void sendData(String text) {
         // 문자열에 개행문자("\n")를 추가해줍니다.
         try{
             // 데이터 송신

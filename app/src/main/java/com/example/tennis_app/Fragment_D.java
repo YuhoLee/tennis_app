@@ -1,15 +1,19 @@
 package com.example.tennis_app;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,10 +30,11 @@ public class Fragment_D extends Fragment implements View.OnClickListener {
 
     private TextView name;
     private TextView email;
-    private TextView mem_info;
-    private TextView user_management;
+    private TextView modify_info;
     private TextView one_on_one;
     private TextView logout;
+    private Switch alarm_switch;
+    private ImageView user_image;
     private FirebaseUser user;
     private DatabaseReference mDatabase;
     private String uid;
@@ -50,18 +55,18 @@ public class Fragment_D extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_d, container, false);
-        name = v.findViewById(R.id.menu_name);
-        email = v.findViewById(R.id.menu_email);
-        mem_info = v.findViewById(R.id.menu_mem_info);
-        user_management = v.findViewById(R.id.menu_user_management);
-        one_on_one = v.findViewById(R.id.menu_OneOnOne);
-        logout = v.findViewById(R.id.menu_logout);
+        name = v.findViewById(R.id.mypage_name);
+        email = v.findViewById(R.id.mypage_email);
+        modify_info = v.findViewById(R.id.modify_userInformation);
+        one_on_one = v.findViewById(R.id.oneonone);
+        logout = v.findViewById(R.id.button_logout);
+        alarm_switch = v.findViewById(R.id.alarm_switch);
+        user_image = v.findViewById(R.id.mypage_image);
         user = FirebaseAuth.getInstance().getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         uid = user.getUid();
 
-        mem_info.setOnClickListener(this);
-        user_management.setOnClickListener(this);
+        modify_info.setOnClickListener(this);
         one_on_one.setOnClickListener(this);
         logout.setOnClickListener(this);
 
@@ -93,22 +98,18 @@ public class Fragment_D extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.menu_mem_info:
+            case R.id.modify_userInformation:
                 Intent intent1 = new Intent(getActivity(),EditInfo.class);
                 intent1.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivity(intent1);
                 break;
-            case R.id.menu_user_management:
-                Intent intent2 = new Intent(getActivity(),UserManagement.class);
-                intent2.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivity(intent2);
-                break;
-            case R.id.menu_OneOnOne:
+
+            case R.id.oneonone:
                 Intent intent3 = new Intent(getActivity(),OneOnOne.class);
                 intent3.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivity(intent3);
                 break;
-            case R.id.menu_logout:
+            case R.id.button_logout:
                 getActivity().finish();
                 break;
 

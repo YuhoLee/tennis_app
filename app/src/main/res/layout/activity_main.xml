@@ -13,13 +13,7 @@
         android:layout_height="0dp"
         android:layout_weight="10"
         tools:layout_editor_absoluteX="203dp"
-        tools:layout_editor_absoluteY="281dp">
-
-        <ListView
-            android:id="@+id/pare_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </FrameLayout>
+        tools:layout_editor_absoluteY="281dp"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
