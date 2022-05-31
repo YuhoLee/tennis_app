@@ -82,6 +82,7 @@ public class Fragment_B extends Fragment {
     private Button custom1_btn;
     private Button custom2_btn;
     private Button custom3_btn;
+    private Button dummy_btn;
     private ImageButton custom_del1;
     private ImageButton custom_del2;
     private ImageButton custom_del3;
@@ -133,10 +134,7 @@ public class Fragment_B extends Fragment {
     private double ball_count = 0.5;
     private int MAXSPEED = 20;
     Thread randomThread;
-    Boolean isRandomStart = false;
-    Boolean custom1Start = false;
-    Boolean custom2Start = false;
-    Boolean custom3Start = false;
+    Boolean[] button_state = {false, false, false, false, false, false};
 
 
     @Override
@@ -163,6 +161,7 @@ public class Fragment_B extends Fragment {
         custom1_btn = v.findViewById(R.id.custom1_btn);
         custom2_btn = v.findViewById(R.id.custom2_btn);
         custom3_btn = v.findViewById(R.id.custom3_btn);
+        dummy_btn = v.findViewById(R.id.week_button);
         custom_del1 = v.findViewById(R.id.custom_del1);
         custom_del2 = v.findViewById(R.id.custom_del2);
         custom_del3 = v.findViewById(R.id.custom_del3);
@@ -177,6 +176,7 @@ public class Fragment_B extends Fragment {
         listDevice = v.findViewById(R.id.paring_list);
         layout = v.findViewById(R.id.adjust_layout);
         switchCompat = v.findViewById(R.id.powerswitch);
+
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
@@ -337,7 +337,7 @@ public class Fragment_B extends Fragment {
                     sendData(data);
                 }
                 else{
-                    isRandomStart = false;
+                    setButtonActive(dummy_btn);
                     power = false;
                     top_edit.setText("0");
                     btm_edit.setText("0");
@@ -495,6 +495,68 @@ public class Fragment_B extends Fragment {
         cycle_edit.setText(strArr[4]);
     }
 
+    public void setButtonActive(Button button){
+        Button[] button_list = {topspin_btn, slice_btn, random_btn, custom1_btn, custom2_btn, custom3_btn};
+        for(int i = 0; i < button_state.length; i++){
+            if(button_state[i]){
+                button_state[i] = false;
+                switch(button_list[i].getId()){
+                    case R.id.custom1_btn:
+                        if(custom1 == "Null") button_list[i].setBackgroundResource(R.drawable.button_round2);
+                        else button.setBackgroundResource(R.drawable.button_round);
+                        break;
+                    case R.id.custom2_btn:
+                        if(custom2 == "Null") button_list[i].setBackgroundResource(R.drawable.button_round2);
+                        else button.setBackgroundResource(R.drawable.button_round);
+                        break;
+                    case R.id.custom3_btn:
+                        if(custom3 == "Null") button_list[i].setBackgroundResource(R.drawable.button_round2);
+                        else button.setBackgroundResource(R.drawable.button_round);
+                        break;
+                    default:
+                        button_list[i].setBackgroundResource(R.drawable.button_round);
+                }
+            }
+        }
+        int reg = 6;
+        for(int i = 0; i < button_list.length; i++){
+            if(button_list[i].getId() == button.getId()){
+                reg = i;
+                break;
+            }
+        }
+        if(reg != 6){
+            button_state[reg] = true;
+            button_list[reg].setBackgroundResource(R.drawable.greenbutton);
+        }
+    }
+    public void enableSeekbar(){
+        top_seekbar.setEnabled(false);
+        btm_seekbar.setEnabled(false);
+        speed_seekbar.setEnabled(false);
+        cycle_seekbar.setEnabled(false);
+        top_edit.setEnabled(false);
+        btm_edit.setEnabled(false);
+        speed_edit.setEnabled(false);
+        cycle_edit.setEnabled(false);
+    }
+
+    public void ableSeekbar(){
+        top_seekbar.setEnabled(true);
+        btm_seekbar.setEnabled(true);
+        speed_seekbar.setEnabled(true);
+        cycle_seekbar.setEnabled(true);
+        top_edit.setEnabled(true);
+        btm_edit.setEnabled(true);
+        speed_edit.setEnabled(true);
+        cycle_edit.setEnabled(true);
+        top_edit.setText("0");
+        btm_edit.setText("0");
+        speed_edit.setText("0");
+        cycle_edit.setText("7");
+        sendData("0, 0, 0, 7");
+    }
+
     public void fixedButtonClick(Button button){
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -502,45 +564,41 @@ public class Fragment_B extends Fragment {
                 if(power)
                 switch(button.getId()){
                     case R.id.topspin_btn:
-                        isRandomStart = false;
+                        if (button_state[0]){
+                            button.setBackgroundResource(R.drawable.button_round);
+                            ableSeekbar();
+                            button_state[0] = false;
+                        }
+                        else{
+                            setButtonActive(button);
+                            enableSeekbar();
+                        }
                         break;
                     case R.id.slice_btn:
-                        isRandomStart = false;
+                        if (button_state[1]){
+                            button.setBackgroundResource(R.drawable.button_round);
+                            ableSeekbar();
+                            button_state[1] = false;
+                        }
+                        else{
+                            setButtonActive(button);
+                            enableSeekbar();
+                        }
                         break;
                     case R.id.random_btn:
                         Log.i(TAG, "random 눌림");
-                        if (isRandomStart){
+                        if (button_state[2]){
                             button.setBackgroundResource(R.drawable.button_round);
-                            top_seekbar.setEnabled(true);
-                            btm_seekbar.setEnabled(true);
-                            speed_seekbar.setEnabled(true);
-                            cycle_seekbar.setEnabled(true);
-                            top_edit.setEnabled(true);
-                            btm_edit.setEnabled(true);
-                            speed_edit.setEnabled(true);
-                            cycle_edit.setEnabled(true);
-                            isRandomStart = false;
-                            top_edit.setText("0");
-                            btm_edit.setText("0");
-                            speed_edit.setText("0");
-                            cycle_edit.setText("7");
-                            sendData("0, 0, 0, 7");
+                            ableSeekbar();
+                            button_state[2] = false;
                         }
                         else{
-                            button.setBackgroundResource(R.drawable.greenbutton);
-                            isRandomStart = true;
-                            top_seekbar.setEnabled(false);
-                            btm_seekbar.setEnabled(false);
-                            speed_seekbar.setEnabled(false);
-                            cycle_seekbar.setEnabled(false);
-                            top_edit.setEnabled(false);
-                            btm_edit.setEnabled(false);
-                            speed_edit.setEnabled(false);
-                            cycle_edit.setEnabled(false);
+                            setButtonActive(button);
+                            enableSeekbar();
                             randomThread = new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    while(isRandomStart){
+                                    while(button_state[2]){
                                         String t = String.valueOf(rnd.nextInt(96) + 5);
                                         String b = String.valueOf(rnd.nextInt(96) + 5);
                                         String s = String.valueOf(rnd.nextInt(MAXSPEED) + 1);
@@ -582,7 +640,7 @@ public class Fragment_B extends Fragment {
                         break;
                 }
                 if(!custom.equals("Null")){
-                    isRandomStart = false;
+                    setButtonActive(button);
                     String[] strArr = custom.split(", ");
                     inputSeekbar(strArr);
                     switch(button.getId()){
