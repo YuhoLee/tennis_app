@@ -2,6 +2,8 @@ package com.example.tennis_app;
 
 import static android.content.ContentValues.TAG;
 
+import static java.lang.Thread.*;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -51,6 +53,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -140,6 +143,8 @@ public class Fragment_B extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getActivity().startService(new Intent(getActivity(), ForcedTerminationService.class));
+
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -194,6 +199,7 @@ public class Fragment_B extends Fragment {
 
         setSwitchCompat();
         countFiredBall();
+        randomStart();
 
         editTextListener(top_edit);
         editTextListener(btm_edit);
@@ -218,9 +224,9 @@ public class Fragment_B extends Fragment {
         remoteSeekbar(cycle_seekbar, cycle_edit);
 
 
-        layout.setOnTouchListener(new View.OnTouchListener(){
+        layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event){
+            public boolean onTouch(View v, MotionEvent event) {
                 hideKeyboard();
                 return false;
             }
@@ -239,7 +245,7 @@ public class Fragment_B extends Fragment {
         if (bluetoothAdapter == null) {   // 디바이스가 블루투스 지원하지 않을 시
         } else {   // 디바이스가 블루투스 지원할 시
             if (bluetoothAdapter.isEnabled()) {   // 블루투스가 활성화되었을 때
-                if(!PairingBluetoothListState()){   // 연결된 기기가 없을 때
+                if (!PairingBluetoothListState()) {   // 연결된 기기가 없을 때
                     selectBluetoothDevice();    // 블루투스 디바이스 선택 함수
                 }
 
@@ -268,7 +274,28 @@ public class Fragment_B extends Fragment {
         return v;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.i(TAG, "Pause 실행");
+    }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        updateCountBall();
+
+        Log.i(TAG, "Stop 실행");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        updateCountBall();
+        sendData("0,0,0,0");
+        Log.i(TAG, "Destroy 실행");
+
+    }
 
     public void updateCountBall(){
         SimpleDateFormat dtf = new SimpleDateFormat("yyyyMMdd");
@@ -276,17 +303,23 @@ public class Fragment_B extends Fragment {
         Date dateObj = calendar.getTime();
         String formattedDate = dtf.format(dateObj);
         String cnt_str = String.valueOf((int)ball_count);
+        Log.i(TAG, formattedDate);
+
         databaseReference.child("users").child(uid).child("ballCount").child(formattedDate).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
+                Log.i(TAG, "update Count Ball");
                 if(!task.isSuccessful()){
+                    Log.i(TAG, "failed");
                 }
                 else{
                     String res = String.valueOf(task.getResult().getValue());
                     if(res.equals("null")){
                         databaseReference.child("users").child(uid).child("ballCount").child(formattedDate).setValue(cnt_str);
+                        Log.i(TAG, "null");
                     }
                     else{
+                        Log.i(TAG, "task");
                         Log.i(TAG, "테스크: " + String.valueOf(task.getResult().getValue()));
                         int res_cnt = Integer.parseInt(String.valueOf(task.getResult().getValue()));
                         res_cnt += (int)ball_count;
@@ -294,6 +327,11 @@ public class Fragment_B extends Fragment {
                     }
                 }
                 ball_count = 0.5;
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i(TAG, "onFailure: "+e.getMessage());
             }
         });
     }
@@ -310,7 +348,7 @@ public class Fragment_B extends Fragment {
                             ball_count += d;
                             Log.i(TAG, "볼카운트: " + String.valueOf(ball_count) + " / 주기: " + s + " / 증가율: " + String.valueOf(d));
                             try {
-                                Thread.sleep(100);
+                                sleep(100);
                             } catch (InterruptedException e) {
                                 Log.i(TAG, "예외 발생!!!");
                                 e.printStackTrace();
@@ -327,6 +365,7 @@ public class Fragment_B extends Fragment {
         switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                Button[] button_list = {topspin_btn, slice_btn, random_btn, custom1_btn, custom2_btn, custom3_btn};
                 if(b) {
                     power = true;
                     top_data = top_edit.getText().toString();
@@ -337,7 +376,29 @@ public class Fragment_B extends Fragment {
                     sendData(data);
                 }
                 else{
-                    setButtonActive(dummy_btn);
+                    Log.i(TAG, "배열: " + String.valueOf(button_state[2]));
+                    for(int i = 0; i < button_state.length; i++){
+                        if(button_state[i]){
+                            button_state[i] = false;
+                            if(i < 3) button_list[i].setBackgroundResource(R.drawable.button_round);
+                            else{
+                                switch(i){
+                                    case 3:
+                                        if(custom1 != "Null") button_list[i].setBackgroundResource(R.drawable.button_round);
+                                        else button_list[i].setBackgroundResource(R.drawable.button_round2);
+                                        break;
+                                    case 4:
+                                        if(custom2 != "Null") button_list[i].setBackgroundResource(R.drawable.button_round);
+                                        else button_list[i].setBackgroundResource(R.drawable.button_round2);
+                                        break;
+                                    case 5:
+                                        if(custom3 != "Null") button_list[i].setBackgroundResource(R.drawable.button_round);
+                                        else button_list[i].setBackgroundResource(R.drawable.button_round2);
+                                        break;
+                                }
+                            }
+                        }
+                    }
                     power = false;
                     top_edit.setText("0");
                     btm_edit.setText("0");
@@ -345,7 +406,6 @@ public class Fragment_B extends Fragment {
                     cycle_edit.setText("7");
                     updateCountBall();
                     sendData("0,0,0,7");
-
                     Log.i(TAG, "setSwitchCompat ㅎㅎ");
                     Log.i(TAG, "Count: " + String.valueOf(ball_count));
                 }
@@ -411,7 +471,7 @@ public class Fragment_B extends Fragment {
                     case "1":
                         custom1 = s;
                         if(!s.equals("Null")){
-                            custom1_btn.setBackgroundResource(R.drawable.greenbutton);
+                            custom1_btn.setBackgroundResource(R.drawable.button_round);
                             custom1_btn.setText(str[0]);
                             custom1_btn.setTypeface(Typeface.DEFAULT);
                             custom_del1.setVisibility(View.VISIBLE);
@@ -426,7 +486,7 @@ public class Fragment_B extends Fragment {
                     case "2":
                         custom2 = s;
                         if(!s.equals("Null")){
-                            custom2_btn.setBackgroundResource(R.drawable.greenbutton);
+                            custom2_btn.setBackgroundResource(R.drawable.button_round);
                             custom2_btn.setText(str[0]);
                             custom2_btn.setTypeface(Typeface.DEFAULT);
                             custom_del2.setVisibility(View.VISIBLE);
@@ -441,7 +501,7 @@ public class Fragment_B extends Fragment {
                     case "3":
                         custom3 = s;
                         if(!s.equals("Null")){
-                            custom3_btn.setBackgroundResource(R.drawable.greenbutton);
+                            custom3_btn.setBackgroundResource(R.drawable.button_round);
                             custom3_btn.setText(str[0]);
                             custom3_btn.setTypeface(Typeface.DEFAULT);
                             custom_del3.setVisibility(View.VISIBLE);
@@ -503,32 +563,30 @@ public class Fragment_B extends Fragment {
                 switch(button_list[i].getId()){
                     case R.id.custom1_btn:
                         if(custom1 == "Null") button_list[i].setBackgroundResource(R.drawable.button_round2);
-                        else button.setBackgroundResource(R.drawable.button_round);
+                        else button_list[i].setBackgroundResource(R.drawable.button_round);
                         break;
                     case R.id.custom2_btn:
                         if(custom2 == "Null") button_list[i].setBackgroundResource(R.drawable.button_round2);
-                        else button.setBackgroundResource(R.drawable.button_round);
+                        else button_list[i].setBackgroundResource(R.drawable.button_round);
                         break;
                     case R.id.custom3_btn:
                         if(custom3 == "Null") button_list[i].setBackgroundResource(R.drawable.button_round2);
-                        else button.setBackgroundResource(R.drawable.button_round);
+                        else button_list[i].setBackgroundResource(R.drawable.button_round);
                         break;
                     default:
                         button_list[i].setBackgroundResource(R.drawable.button_round);
                 }
             }
         }
-        int reg = 6;
+        int reg = 0;
         for(int i = 0; i < button_list.length; i++){
             if(button_list[i].getId() == button.getId()){
                 reg = i;
                 break;
             }
         }
-        if(reg != 6){
-            button_state[reg] = true;
-            button_list[reg].setBackgroundResource(R.drawable.greenbutton);
-        }
+        button_state[reg] = true;
+        button_list[reg].setBackgroundResource(R.drawable.greenbutton);
     }
     public void enableSeekbar(){
         top_seekbar.setEnabled(false);
@@ -557,67 +615,82 @@ public class Fragment_B extends Fragment {
         sendData("0, 0, 0, 7");
     }
 
+    public void randomStart(){
+        randomThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true){
+                    if (button_state[2]){
+                        String t = String.valueOf(rnd.nextInt(96) + 5);
+                        String b = String.valueOf(rnd.nextInt(96) + 5);
+                        String s = String.valueOf(rnd.nextInt(MAXSPEED) + 1);
+                        String c = String.valueOf(rnd.nextInt(5) + 2);
+                        String[] arr_str = {"Null", t, b, s, c};
+                        inputSeekbar(arr_str);
+                        Log.i(TAG, "random: "+t+", "+b+", "+s+", "+c);
+                        try {
+                            sleep(Integer.parseInt(c) * 1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+        randomThread.start();
+    }
+
     public void fixedButtonClick(Button button){
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(power)
-                switch(button.getId()){
-                    case R.id.topspin_btn:
-                        if (button_state[0]){
-                            button.setBackgroundResource(R.drawable.button_round);
-                            ableSeekbar();
-                            button_state[0] = false;
-                        }
-                        else{
-                            setButtonActive(button);
-                            enableSeekbar();
-                        }
-                        break;
-                    case R.id.slice_btn:
-                        if (button_state[1]){
-                            button.setBackgroundResource(R.drawable.button_round);
-                            ableSeekbar();
-                            button_state[1] = false;
-                        }
-                        else{
-                            setButtonActive(button);
-                            enableSeekbar();
-                        }
-                        break;
-                    case R.id.random_btn:
-                        Log.i(TAG, "random 눌림");
-                        if (button_state[2]){
-                            button.setBackgroundResource(R.drawable.button_round);
-                            ableSeekbar();
-                            button_state[2] = false;
-                        }
-                        else{
-                            setButtonActive(button);
-                            enableSeekbar();
-                            randomThread = new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    while(button_state[2]){
-                                        String t = String.valueOf(rnd.nextInt(96) + 5);
-                                        String b = String.valueOf(rnd.nextInt(96) + 5);
-                                        String s = String.valueOf(rnd.nextInt(MAXSPEED) + 1);
-                                        String c = String.valueOf(rnd.nextInt(5) + 2);
-                                        sendData(t+", "+b+", "+s+", "+c);
-                                        Log.i(TAG, "random: "+t+", "+b+", "+s+", "+c);
-                                        try {
-                                            Thread.sleep(Integer.parseInt(c) * 1000);
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-
-                                }
-                            });
-                            randomThread.start();
-                        }
-                        break;
-                }
+                    switch(button.getId()){
+                        case R.id.topspin_btn:
+                            if (button_state[0]){
+                                button.setBackgroundResource(R.drawable.button_round);
+                                ableSeekbar();
+                                button_state[0] = false;
+                            }
+                            else{
+                                top_edit.setText("100");
+                                btm_edit.setText("30");
+                                speed_edit.setText("20");
+                                setButtonActive(button);
+                                enableSeekbar();
+                                cycle_edit.setEnabled(true);
+                                cycle_seekbar.setEnabled(true);
+                            }
+                            break;
+                        case R.id.slice_btn:
+                            if (button_state[1]){
+                                button.setBackgroundResource(R.drawable.button_round);
+                                ableSeekbar();
+                                button_state[1] = false;
+                            }
+                            else{
+                                top_edit.setText("30");
+                                btm_edit.setText("100");
+                                speed_edit.setText("20");
+                                setButtonActive(button);
+                                enableSeekbar();
+                                cycle_edit.setEnabled(true);
+                                cycle_seekbar.setEnabled(true);
+                            }
+                            break;
+                        case R.id.random_btn:
+                            Log.i(TAG, "random 눌림");
+                            if (button_state[2]){
+                                button.setBackgroundResource(R.drawable.button_round);
+                                ableSeekbar();
+                                button_state[2] = false;
+                            }
+                            else{
+                                setButtonActive(button);
+                                enableSeekbar();
+                            }
+                            break;
+                    }
             }
         });
     }
@@ -626,6 +699,7 @@ public class Fragment_B extends Fragment {
         button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                Button[] button_list = {topspin_btn, slice_btn, random_btn, custom1_btn, custom2_btn, custom3_btn};
                 Log.i(TAG, "before btn: " + custom1 + ", " + custom2 + ", " + custom3);
                 String custom = "Null";
                 switch(n){
@@ -639,61 +713,81 @@ public class Fragment_B extends Fragment {
                         custom = custom3;
                         break;
                 }
-                if(!custom.equals("Null")){
-                    setButtonActive(button);
-                    String[] strArr = custom.split(", ");
-                    inputSeekbar(strArr);
-                    switch(button.getId()){
-                        case R.id.custom1_btn:
-
+                int idx = Integer.parseInt(n)+2;
+                if(button_state[idx]){
+                    ableSeekbar();
+                    button_state[(Integer.parseInt(n)+2)] = false;
+                    switch(idx){
+                        case 3:
+                            if(custom1 != "Null") button_list[idx].setBackgroundResource(R.drawable.button_round);
+                            else button_list[idx].setBackgroundResource(R.drawable.button_round2);
+                            break;
+                        case 4:
+                            if(custom2 != "Null") button_list[idx].setBackgroundResource(R.drawable.button_round);
+                            else button_list[idx].setBackgroundResource(R.drawable.button_round2);
+                            break;
+                        case 5:
+                            if(custom3 != "Null") button_list[idx].setBackgroundResource(R.drawable.button_round);
+                            else button_list[idx].setBackgroundResource(R.drawable.button_round2);
+                            break;
                     }
                 }
                 else{
-                    final EditText etEdit = new EditText(getActivity());
-                    etEdit.setOnKeyListener(new View.OnKeyListener() {
-                        @Override
-                        public boolean onKey(View v, int keyCode, KeyEvent event) {
-                            if (keyCode == event.KEYCODE_ENTER)
-                                return true;
-                            return false;
+                    if(!custom.equals("Null")){
+                        if(power) {
+                            String[] strArr = custom.split(", ");
+                            inputSeekbar(strArr);
+                            enableSeekbar();
+                            setButtonActive(button);
                         }
-                    });
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-                    dialog.setTitle("프리셋 이름 설정");
-                    dialog.setView(etEdit);
-                    dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            String custom_name = etEdit.getText().toString();
-                            button.setText(custom_name);
-                            button.setTypeface(Typeface.DEFAULT);
-                            String custom_str = custom_name + ", " + top_edit.getText().toString() + ", " + btm_edit.getText().toString() + ", " + speed_edit.getText().toString() + ", " + cycle_edit.getText().toString();
-                            switch (button.getId()){
-                                case R.id.custom1_btn:
-                                    custom1 = custom_str;
-                                    custom_del1.setVisibility(View.VISIBLE);
-                                    custom_del1.setEnabled(true);
-                                    break;
-                                case R.id.custom2_btn:
-                                    custom2 = custom_str;
-                                    custom_del2.setVisibility(View.VISIBLE);
-                                    custom_del2.setEnabled(true);
-                                    break;
-                                case R.id.custom3_btn:
-                                    custom3 = custom_str;
-                                    custom_del3.setVisibility(View.VISIBLE);
-                                    custom_del3.setEnabled(true);
-                                    break;
+                    }
+                    else{
+                        final EditText etEdit = new EditText(getActivity());
+                        etEdit.setOnKeyListener(new View.OnKeyListener() {
+                            @Override
+                            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                                if (keyCode == event.KEYCODE_ENTER)
+                                    return true;
+                                return false;
                             }
-                            databaseReference.child("users").child(uid).child("custom"+n).setValue(custom_str);
-                            button.setBackgroundResource(R.drawable.button_round);
-                        }
-                    });
-                    dialog.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
-                    dialog.show();
+                        });
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+                        dialog.setTitle("프리셋 이름 설정");
+                        dialog.setView(etEdit);
+                        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                String custom_name = etEdit.getText().toString();
+                                button.setText(custom_name);
+                                button.setTypeface(Typeface.DEFAULT);
+                                String custom_str = custom_name + ", " + top_edit.getText().toString() + ", " + btm_edit.getText().toString() + ", " + speed_edit.getText().toString() + ", " + cycle_edit.getText().toString();
+                                switch (button.getId()){
+                                    case R.id.custom1_btn:
+                                        custom1 = custom_str;
+                                        custom_del1.setVisibility(View.VISIBLE);
+                                        custom_del1.setEnabled(true);
+                                        break;
+                                    case R.id.custom2_btn:
+                                        custom2 = custom_str;
+                                        custom_del2.setVisibility(View.VISIBLE);
+                                        custom_del2.setEnabled(true);
+                                        break;
+                                    case R.id.custom3_btn:
+                                        custom3 = custom_str;
+                                        custom_del3.setVisibility(View.VISIBLE);
+                                        custom_del3.setEnabled(true);
+                                        break;
+                                }
+                                databaseReference.child("users").child(uid).child("custom"+n).setValue(custom_str);
+                                button.setBackgroundResource(R.drawable.button_round);
+                            }
+                        });
+                        dialog.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                        dialog.show();
+                    }
                 }
                 Log.i(TAG, "after btn: " + custom1 + ", " + custom2 + ", " + custom3);
             }
@@ -933,11 +1027,9 @@ public class Fragment_B extends Fragment {
                             Toast.makeText(getActivity(),"블루투스 연결 오류",Toast.LENGTH_SHORT).show();
                         }
                     });
-
                 }
             }
         });
         BTConnect.start();
     }
-
 }

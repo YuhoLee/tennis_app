@@ -44,7 +44,7 @@ import java.util.Date;
 public class Fragment_A extends Fragment {
     private TextView name;
     private String uid;
-    private int dataCount;
+    private int dataCount = 0;
     private ArrayList<Integer> jsonList; // ArrayList 선언
     private ArrayList<String> labelList; // ArrayList 선언
     private BarChart barChart;
@@ -94,6 +94,8 @@ public class Fragment_A extends Fragment {
             }
         });
 
+        calcWeekDay();
+        setWeekTrain();
         setWeekTrain();
         barChart.invalidate();
 
@@ -116,7 +118,7 @@ public class Fragment_A extends Fragment {
         for(int i = 0; i < 7; i++){
             labelList.add(weekDay[i]);
         }
-        calcWeekDay();
+
         for(int i = 0; i < 7; i++){
             databaseReference.child("users").child(uid).child("ballCount").child(String.valueOf(weekStr[i])).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                 @Override
@@ -132,20 +134,19 @@ public class Fragment_A extends Fragment {
                         else{
                             jsonList.add(Integer.parseInt(res));
                         }
-                        if(dataCount >=  7){
+                        if(dataCount == 7){
                             Log.i(TAG, "카운트: " + String.valueOf(dataCount));
                             for(int i : jsonList){
                                 Log.i(TAG, "ㅇㅋ" + String.valueOf(i));
                             }
                             BarChartGraph(labelList, jsonList);
                             barChart.setTouchEnabled(false); //확대하지못하게 막아버림! 별로 안좋은 기능인 것 같아~
-                            barChart.getAxisRight().setAxisMaxValue(200);
-                            barChart.getAxisLeft().setAxisMaxValue(200);
+
                         }
                     }
                 }
             });
-
+            dataCount = 0;
         }
     }
 
@@ -159,6 +160,7 @@ public class Fragment_A extends Fragment {
         ArrayList<BarEntry> entries = new ArrayList<>();
         for (int i = 0; i < valList.size(); i++) {
             entries.add(new BarEntry((Integer) valList.get(i), i));
+            Log.i(TAG, "val: " + valList.get(i));
         }
 
         BarDataSet depenses = new BarDataSet(entries, "일일 훈련시간"); // 변수로 받아서 넣어줘도 됨
@@ -168,6 +170,7 @@ public class Fragment_A extends Fragment {
         ArrayList<String> labels = new ArrayList<String>();
         for (int i = 0; i < labelList.size(); i++) {
             labels.add((String) labelList.get(i));
+            Log.i(TAG, "label: " + (String) labelList.get(i));
         }
 
 
