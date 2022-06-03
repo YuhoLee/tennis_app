@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -46,8 +47,6 @@ public class Fragment_C extends Fragment {
     private ArrayList<String> labelList; // ArrayList 선언
     ArrayAdapter month_adapter;
     ArrayAdapter year_adapter;
-    private String[] year_arr = new String[5];
-    private String[] month_arr = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
     private Date now = new Date();
     private String now_str = dateFormat.format(now);
@@ -56,11 +55,15 @@ public class Fragment_C extends Fragment {
     private BarChart barChart;
     private Button weekButton;
     private Button monthButton;
-    private Spinner month_spinner;
-    private Spinner year_spinner;
-    private TextView week_txt;
+    private Button year_up;
+    private Button year_down;
+    private Button month_up;
+    private Button month_down;
     private TextView month_txt;
     private TextView year_txt;
+    private TextView title_txt;
+    private EditText month_edit;
+    private EditText year_edit;
     private Calendar cal;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
@@ -69,7 +72,6 @@ public class Fragment_C extends Fragment {
     private String[] weekStr;
     private int dataCount;
     private long mLastClickTime = 0;
-    private boolean isInit = false;
 
 
     @Override
@@ -103,65 +105,39 @@ public class Fragment_C extends Fragment {
         barChart = (BarChart)v.findViewById(R.id.fragment_bluetooth_chat_barchart);
         weekButton = v.findViewById(R.id.week_button);
         monthButton = v.findViewById(R.id.month_button);
-        week_txt = v.findViewById(R.id.week_txt);
+        year_up = v.findViewById(R.id.year_up);
+        year_down = v.findViewById(R.id.year_down);
+        month_up = v.findViewById(R.id.month_up);
+        month_down = v.findViewById(R.id.month_down);
         month_txt = v.findViewById(R.id.month_txt);
         year_txt = v.findViewById(R.id.year_txt);
-        month_spinner = v.findViewById(R.id.month_spinner);
-        year_spinner = v.findViewById(R.id.year_spinner);
-
-        Log.i(TAG, "curr_year" + curr_year);
-        Log.i(TAG, "curr_month" + curr_month);
-
-        month_adapter = new ArrayAdapter(getActivity(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, month_arr);
-        month_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        month_spinner.setAdapter(month_adapter);
-        month_spinner.setSelection(0, false);
-        month_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                month_txt.setText(month_arr[i] + "월 ");
-                curr_month = month_arr[i];
-                Log.i(TAG, "curr_year" + curr_year);
-                Log.i(TAG, "curr_month" + curr_month);
-                setMonthTrain(curr_year, curr_month);
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        int year_itg = Integer.parseInt(now_str.substring(0,4));
-        for (int i = 0; i < 5; i++){
-            year_arr[i] = String.valueOf(year_itg - i);
-            Log.i(TAG,"year: " + year_arr[i]);
-        }
-        year_adapter = new ArrayAdapter(getActivity(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, year_arr);
-        year_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        year_spinner.setAdapter(year_adapter);
-        year_spinner.setSelection(0, false);
-        year_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                year_txt.setText(year_arr[i] + "년");
-                curr_year = year_arr[i];
-                Log.i(TAG, "curr_year" + curr_year);
-                Log.i(TAG, "curr_month" + curr_month);
-                setMonthTrain(curr_year, curr_month);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
+        title_txt = v.findViewById(R.id.title_txt);
+        month_edit = v.findViewById(R.id.month_edit);
+        year_edit = v.findViewById(R.id.year_edit);
 
         buttonClick(weekButton);
         buttonClick(monthButton);
+        buttonClick(year_up);
+        buttonClick(year_down);
+        buttonClick(month_up);
+        buttonClick(month_down);
         setWeekTrain();  //그래프 기본 세팅
         return v;
+    }
+
+    public void enableTrueFalse(Boolean b){
+        int vis, n_vis;
+        if(b) vis = View.VISIBLE;
+        else vis = View.INVISIBLE;
+
+        year_txt.setVisibility(vis);
+        month_txt.setVisibility(vis);
+        year_edit.setVisibility(vis);
+        month_edit.setVisibility(vis);
+        year_up.setVisibility(vis);
+        year_down.setVisibility(vis);
+        month_up.setVisibility(vis);
+        month_down.setVisibility(vis);
     }
 
 
@@ -172,30 +148,58 @@ public class Fragment_C extends Fragment {
                 if(SystemClock.elapsedRealtime() - mLastClickTime < 500){
                     return;
                 }
+                String str;
+                int integer_str;
                 switch(button.getId()){
                     case R.id.week_button:
-                        month_txt.setVisibility(View.INVISIBLE);
-                        month_spinner.setVisibility(View.INVISIBLE);
-                        week_txt.setText("주간");
-                        week_txt.setVisibility(View.VISIBLE);
+                        enableTrueFalse(false);
+                        title_txt.setText("주간 훈련 통계");
                         setWeekTrain();
                         break;
                     case R.id.month_button:
-                        week_txt.setVisibility(View.INVISIBLE);
+                        enableTrueFalse(true);
+                        title_txt.setText("월별 훈련 통계");
+                        month_edit.setText(curr_month);
+                        year_edit.setText(curr_year);
                         setMonthTrain("0","0");
-                        month_txt.setText(curr_month + "월 ");
-                        month_txt.setVisibility(View.VISIBLE);
-                        month_spinner.setVisibility(View.VISIBLE);
-                        year_txt.setText(curr_year + "년");
-                        year_txt.setVisibility(View.VISIBLE);
-                        year_spinner.setVisibility(View.VISIBLE);
-                        month_spinner.setSelection(0, true);
-                        year_spinner.setSelection(0, true);
+                        break;
+                    case R.id.year_up:
+                        str = year_edit.getText().toString();
+                        integer_str = Integer.parseInt(str);
+                        if(integer_str < Integer.parseInt(curr_year)){
+                            year_edit.setText(String.valueOf(integer_str+1));
+                        }
+                        break;
+                    case R.id.year_down:
+                        str = year_edit.getText().toString();
+                        integer_str = Integer.parseInt(str);
+                        if(integer_str > Integer.parseInt(curr_year)-5){
+                            year_edit.setText(String.valueOf(integer_str-1));
+                        }
+                        break;
+                    case R.id.month_up:
+                        str = month_edit.getText().toString();
+                        integer_str = Integer.parseInt(str);
+                        if(integer_str < 12){
+                            month_edit.setText(monthFormat(integer_str+1));
+                        }
+                        break;
+                    case R.id.month_down:
+                        str = month_edit.getText().toString();
+                        integer_str = Integer.parseInt(str);
+                        if(integer_str < 1){
+                            month_edit.setText(monthFormat(integer_str-1));
+                        }
                         break;
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
             }
         });
+    }
+
+    public String monthFormat(int i){
+        if(i < 10) return "0" + String.valueOf(i);
+        else return String.valueOf(i);
     }
 
     public void calcWeekDay(){
@@ -231,10 +235,6 @@ public class Fragment_C extends Fragment {
                             jsonList.add(Integer.parseInt(res));
                         }
                         if(dataCount >=  7){
-                            Log.i(TAG, "카운트: " + String.valueOf(dataCount));
-                            for(int m : jsonList){
-                                Log.i(TAG, "ㅇㅋ" + String.valueOf(m));
-                            }
                             BarChartGraph(labelList, jsonList);
                             barChart.setTouchEnabled(false); //확대하지못하게 막아버림! 별로 안좋은 기능인 것 같아~
                         }
@@ -298,10 +298,6 @@ public class Fragment_C extends Fragment {
                             jsonList.add(Integer.parseInt(res));
                         }
                         if(dataCount == md){
-                            Log.i(TAG, "카운트: " + String.valueOf(dataCount));
-                            for(int m : jsonList){
-                                Log.i(TAG, "ㅇㅋ" + String.valueOf(m));
-                            }
                             BarChartGraph(labelList, jsonList);
                             barChart.setTouchEnabled(false); //확대하지못하게 막아버림! 별로 안좋은 기능인 것 같아~
                         }
