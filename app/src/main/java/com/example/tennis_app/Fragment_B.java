@@ -78,17 +78,17 @@ import java.util.Set;
 import java.util.UUID;
 
 public class Fragment_B extends Fragment {
-    private SwitchCompat sw;
+    private Button isBluetooth;
     private Button topspin_btn;
     private Button slice_btn;
     private Button random_btn;
     private Button custom1_btn;
     private Button custom2_btn;
     private Button custom3_btn;
-    private Button dummy_btn;
     private ImageButton custom_del1;
     private ImageButton custom_del2;
     private ImageButton custom_del3;
+    private ImageButton bluetooth_btn;
     private SeekBar top_seekbar;
     private SeekBar btm_seekbar;
     private SeekBar speed_seekbar;
@@ -160,13 +160,14 @@ public class Fragment_B extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.adjust, container, false);
+        isBluetooth = v.findViewById(R.id.isBluetooth);
         topspin_btn = v.findViewById(R.id.topspin_btn);
         slice_btn = v.findViewById(R.id.slice_btn);
         random_btn = v.findViewById(R.id.random_btn);
         custom1_btn = v.findViewById(R.id.custom1_btn);
         custom2_btn = v.findViewById(R.id.custom2_btn);
         custom3_btn = v.findViewById(R.id.custom3_btn);
-        dummy_btn = v.findViewById(R.id.week_button);
+        bluetooth_btn = v.findViewById(R.id.bluetooth_btn);
         custom_del1 = v.findViewById(R.id.custom_del1);
         custom_del2 = v.findViewById(R.id.custom_del2);
         custom_del3 = v.findViewById(R.id.custom_del3);
@@ -197,6 +198,7 @@ public class Fragment_B extends Fragment {
         customInit("2");
         customInit("3");
 
+        isBluetoothStart();
         setSwitchCompat();
         countFiredBall();
         randomStart();
@@ -232,44 +234,49 @@ public class Fragment_B extends Fragment {
             }
         });
 
-        // 블루투스 활성화 하기
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); // 블루투스 어댑터를 디폴트 어댑터로 설정
-        dataDevice = new ArrayList<>();
-        adapterDevice = new SimpleAdapter(getActivity(), dataDevice, android.R.layout.simple_list_item_2, new String[]{"name", "address"}, new int[]{android.R.id.text1, android.R.id.text2});
-        listDevice.setAdapter(adapterDevice);
-        //검색된 블루투스 디바이스 데이터
-        bluetoothDevices = new ArrayList<>();
-        //선택한 디바이스 없음
-        selectDevice = -1;
+        bluetooth_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 블루투스 활성화 하기
+                bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); // 블루투스 어댑터를 디폴트 어댑터로 설정
+                dataDevice = new ArrayList<>();
+                adapterDevice = new SimpleAdapter(getActivity(), dataDevice, android.R.layout.simple_list_item_2, new String[]{"name", "address"}, new int[]{android.R.id.text1, android.R.id.text2});
+                listDevice.setAdapter(adapterDevice);
+                //검색된 블루투스 디바이스 데이터
+                bluetoothDevices = new ArrayList<>();
+                //선택한 디바이스 없음
+                selectDevice = -1;
 
-        if (bluetoothAdapter == null) {   // 디바이스가 블루투스 지원하지 않을 시
-        } else {   // 디바이스가 블루투스 지원할 시
-            if (bluetoothAdapter.isEnabled()) {   // 블루투스가 활성화되었을 때
-                if (!PairingBluetoothListState()) {   // 연결된 기기가 없을 때
-                    selectBluetoothDevice();    // 블루투스 디바이스 선택 함수
+                if (bluetoothAdapter == null) {   // 디바이스가 블루투스 지원하지 않을 시
+                } else {   // 디바이스가 블루투스 지원할 시
+                    if (bluetoothAdapter.isEnabled()) {   // 블루투스가 활성화되었을 때
+                        if (!PairingBluetoothListState()) {   // 연결된 기기가 없을 때
+                            selectBluetoothDevice();    // 블루투스 디바이스 선택 함수
+                        }
+
+                    } else {   // 블루투스가 비활성화일 때
+                        // 블루투스 활성화를 위한 다이얼로그 출력
+                        Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                        // 선택한 값이 onActivityResult 함수에서 콜백된다.
+                        ActivityResultLauncher<Intent> startActivityResult = registerForActivityResult(
+                                new ActivityResultContracts.StartActivityForResult(),
+                                new ActivityResultCallback<ActivityResult>() {
+                                    @Override
+                                    public void onActivityResult(ActivityResult result) {
+                                        if (result.getResultCode() == Activity.RESULT_OK) { // 사용 선택 시
+                                            selectBluetoothDevice();    // 블루투스 디바이스 선택 함수
+                                        } else {   // 취소 시
+
+                                        }
+                                    }
+                                });
+                        startActivityResult.launch(intent);
+
+
+                    }
                 }
-
-            } else {   // 블루투스가 비활성화일 때
-                // 블루투스 활성화를 위한 다이얼로그 출력
-                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                // 선택한 값이 onActivityResult 함수에서 콜백된다.
-                ActivityResultLauncher<Intent> startActivityResult = registerForActivityResult(
-                        new ActivityResultContracts.StartActivityForResult(),
-                        new ActivityResultCallback<ActivityResult>() {
-                            @Override
-                            public void onActivityResult(ActivityResult result) {
-                                if (result.getResultCode() == Activity.RESULT_OK) { // 사용 선택 시
-                                    selectBluetoothDevice();    // 블루투스 디바이스 선택 함수
-                                } else {   // 취소 시
-
-                                }
-                            }
-                        });
-                startActivityResult.launch(intent);
-
-
             }
-        }
+        });
 
         return v;
     }
@@ -822,6 +829,28 @@ public class Fragment_B extends Fragment {
         });
     }
 
+    public void isBluetoothStart(){
+        Thread isPairing = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true){
+                    if(PairingBluetoothListState()){
+                        isBluetooth.setBackgroundResource(R.drawable.shape_for_circle_button);
+                    }
+                    else{
+                        isBluetooth.setBackgroundResource(R.drawable.shape_for_circle_button2);
+                    }
+
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        isPairing.start();
+    }
 
     // 블루투스 관련
     public Boolean PairingBluetoothListState() {
@@ -1012,6 +1041,7 @@ public class Fragment_B extends Fragment {
                         @SuppressLint({"ShowToast", "SetTextI18n"})
                         @Override
                         public void run() {
+                            isBluetooth.setBackgroundResource(R.drawable.shape_for_circle_button);
                             Toast.makeText(getActivity(),deviceName + " 연결 완료",Toast.LENGTH_LONG).show();
                             asyncDialog.dismiss();
                         }

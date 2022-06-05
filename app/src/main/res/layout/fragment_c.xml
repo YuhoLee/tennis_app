@@ -17,6 +17,15 @@
         android:text="주간 훈련 통계"
         android:textSize="30dp" />
 
+    <TextView
+        android:id="@+id/week_period"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="120dp"
+        android:text="0000-00-00 ~ 0000-00-00"
+        android:textSize="20dp"/>
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -118,6 +127,16 @@
             android:layout_weight="1"
             android:text=" 월"
             android:textSize="20dp"
+            android:visibility="invisible"/>
+
+        <ImageButton
+            android:id="@+id/search_btn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="20dp"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_baseline_search_24"
             android:visibility="invisible"/>
 
     </LinearLayout>

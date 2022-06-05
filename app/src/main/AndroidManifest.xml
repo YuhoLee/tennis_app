@@ -44,7 +44,7 @@
             android:stopWithTask="false"></service>
 
         <activity
-            android:name=".Login"
+            android:name=".LoadingActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,6 +52,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="LoginRegisterMain"/>
+        <activity android:name=".Login"/>
         <activity
             android:name=".MainActivity"
             android:windowSoftInputMode="adjustResize" />

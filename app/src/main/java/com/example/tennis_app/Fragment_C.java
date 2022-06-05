@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -52,6 +53,8 @@ public class Fragment_C extends Fragment {
     private String now_str = dateFormat.format(now);
     private String curr_year = now_str.substring(0,4);
     private String curr_month = now_str.substring(4,6);
+    private String year;
+    private String month;
     private BarChart barChart;
     private Button weekButton;
     private Button monthButton;
@@ -59,6 +62,8 @@ public class Fragment_C extends Fragment {
     private Button year_down;
     private Button month_up;
     private Button month_down;
+    private ImageButton search_btn;
+    private TextView week_period;
     private TextView month_txt;
     private TextView year_txt;
     private TextView title_txt;
@@ -109,24 +114,30 @@ public class Fragment_C extends Fragment {
         year_down = v.findViewById(R.id.year_down);
         month_up = v.findViewById(R.id.month_up);
         month_down = v.findViewById(R.id.month_down);
+        week_period = v.findViewById(R.id.week_period);
         month_txt = v.findViewById(R.id.month_txt);
         year_txt = v.findViewById(R.id.year_txt);
         title_txt = v.findViewById(R.id.title_txt);
         month_edit = v.findViewById(R.id.month_edit);
         year_edit = v.findViewById(R.id.year_edit);
+        search_btn = v.findViewById(R.id.search_btn);
 
         buttonClick(weekButton);
         buttonClick(monthButton);
-        buttonClick(year_up);
-        buttonClick(year_down);
-        buttonClick(month_up);
-        buttonClick(month_down);
+        udButtonClick(year_up);
+        udButtonClick(year_down);
+        udButtonClick(month_up);
+        udButtonClick(month_down);
+        searchButtonClick();
         setWeekTrain();  //그래프 기본 세팅
+        String first = weekStr[0].substring(0,4) + "-" + weekStr[0].substring(4,6) + "-" + weekStr[0].substring(6);
+        String last = weekStr[6].substring(0,4) + "-" + weekStr[6].substring(4,6) + "-" + weekStr[6].substring(6);
+        week_period.setText(first + " ~ " + last);
         return v;
     }
 
     public void enableTrueFalse(Boolean b){
-        int vis, n_vis;
+        int vis;
         if(b) vis = View.VISIBLE;
         else vis = View.INVISIBLE;
 
@@ -138,31 +149,27 @@ public class Fragment_C extends Fragment {
         year_down.setVisibility(vis);
         month_up.setVisibility(vis);
         month_down.setVisibility(vis);
+        search_btn.setVisibility(vis);
     }
 
+    public void searchButtonClick(){
+        search_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                year = year_edit.getText().toString();
+                month = month_edit.getText().toString();
+                setMonthTrain(year, month);
+            }
+        });
+    }
 
-    public void buttonClick(Button button){
+    public void udButtonClick(Button button){
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(SystemClock.elapsedRealtime() - mLastClickTime < 500){
-                    return;
-                }
                 String str;
                 int integer_str;
                 switch(button.getId()){
-                    case R.id.week_button:
-                        enableTrueFalse(false);
-                        title_txt.setText("주간 훈련 통계");
-                        setWeekTrain();
-                        break;
-                    case R.id.month_button:
-                        enableTrueFalse(true);
-                        title_txt.setText("월별 훈련 통계");
-                        month_edit.setText(curr_month);
-                        year_edit.setText(curr_year);
-                        setMonthTrain("0","0");
-                        break;
                     case R.id.year_up:
                         str = year_edit.getText().toString();
                         integer_str = Integer.parseInt(str);
@@ -187,10 +194,41 @@ public class Fragment_C extends Fragment {
                     case R.id.month_down:
                         str = month_edit.getText().toString();
                         integer_str = Integer.parseInt(str);
-                        if(integer_str < 1){
+                        if(integer_str > 1){
                             month_edit.setText(monthFormat(integer_str-1));
                         }
                         break;
+                }
+            }
+        });
+    }
+    public void buttonClick(Button button){
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(SystemClock.elapsedRealtime() - mLastClickTime < 500){
+                    return;
+                }
+                switch(button.getId()){
+                    case R.id.week_button:
+                        enableTrueFalse(false);
+                        setWeekTrain();
+                        String first = weekStr[0].substring(0,4) + "-" + weekStr[0].substring(4,6) + "-" + weekStr[0].substring(6);
+                        String last = weekStr[6].substring(0,4) + "-" + weekStr[6].substring(4,6) + "-" + weekStr[6].substring(6);
+                        week_period.setText(first + " ~ " + last);
+                        week_period.setVisibility(View.VISIBLE);
+                        title_txt.setText("주간 훈련 통계");
+                        break;
+                    case R.id.month_button:
+                        enableTrueFalse(true);
+                        week_period.setVisibility(View.INVISIBLE);
+                        title_txt.setText("월별 훈련 통계");
+                        month_edit.setText(curr_month);
+                        year_edit.setText(curr_year);
+                        setMonthTrain("0","0");
+                        break;
+                    case R.id.search_btn:
+
                 }
                 mLastClickTime = SystemClock.elapsedRealtime();
             }

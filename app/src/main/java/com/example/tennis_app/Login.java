@@ -28,8 +28,6 @@ public class Login extends AppCompatActivity {
     private EditText email_txt;
     private EditText password_txt;
     private Button login_btn;
-    private TextView forgot;
-    private TextView register;
     private CheckBox checkbox_auto_login;
     private CheckBox checkbox_saved_id;
 
@@ -52,8 +50,6 @@ public class Login extends AppCompatActivity {
         email_txt = findViewById(R.id.email);
         password_txt = findViewById(R.id.password);
         login_btn = findViewById(R.id.loginButton);
-        forgot = findViewById(R.id.registerClick);
-        register = findViewById(R.id.registerClick);
         checkbox_auto_login = findViewById(R.id.checkBox_autologin);
         checkbox_saved_id = findViewById(R.id.checkBox_saveId);
         intent = new Intent(this, com.example.tennis_app.Register.class);
@@ -98,13 +94,6 @@ public class Login extends AppCompatActivity {
                     return true;
                 }
                 return false;
-            }
-        });
-
-        register.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                startActivity(intent);
             }
         });
 
