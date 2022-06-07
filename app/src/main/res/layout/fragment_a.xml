@@ -16,7 +16,7 @@
         android:layout_height="match_parent"
         android:layout_marginTop="190dp"
         android:background="@drawable/button_round3"
-        android:alpha="0.8"/>
+        android:alpha="0.9"/>
 
 
 
