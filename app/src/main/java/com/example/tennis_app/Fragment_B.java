@@ -135,7 +135,7 @@ public class Fragment_B extends Fragment {
     Boolean power = false;
     Random rnd = new Random();
     private double ball_count = 0.5;
-    private int MAXSPEED = 20;
+    private int MAXSPEED = 12;
     Thread randomThread;
     Boolean[] button_state = {false, false, false, false, false, false};
 
@@ -627,20 +627,25 @@ public class Fragment_B extends Fragment {
             @Override
             public void run() {
                 while(true){
-                    if (button_state[2]){
-                        String t = String.valueOf(rnd.nextInt(96) + 5);
-                        String b = String.valueOf(rnd.nextInt(96) + 5);
-                        String s = String.valueOf(rnd.nextInt(MAXSPEED) + 1);
-                        String c = String.valueOf(rnd.nextInt(5) + 2);
-                        String[] arr_str = {"Null", t, b, s, c};
-                        inputSeekbar(arr_str);
-                        Log.i(TAG, "random: "+t+", "+b+", "+s+", "+c);
-                        try {
-                            sleep(Integer.parseInt(c) * 1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                    try{
+                        if (button_state[2]){
+                            String t = String.valueOf(rnd.nextInt(MAXSPEED) + 8);
+                            String b = String.valueOf(rnd.nextInt(MAXSPEED) + 8);
+                            String s = String.valueOf(100);
+                            String c = String.valueOf(7);
+                            String[] arr_str = {"Null", t, b, s, c};
+                            inputSeekbar(arr_str);
+                            Log.i(TAG, "random: "+t+", "+b+", "+s+", "+c);
+                            try {
+                                sleep(Integer.parseInt(c) * 1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
+                    catch(Exception e){
+                    }
+
                 }
             }
         });
@@ -660,9 +665,9 @@ public class Fragment_B extends Fragment {
                                 button_state[0] = false;
                             }
                             else{
-                                top_edit.setText("100");
-                                btm_edit.setText("30");
-                                speed_edit.setText("20");
+                                top_edit.setText("20");
+                                btm_edit.setText("12");
+                                speed_edit.setText("100");
                                 setButtonActive(button);
                                 enableSeekbar();
                                 cycle_edit.setEnabled(true);
@@ -676,9 +681,9 @@ public class Fragment_B extends Fragment {
                                 button_state[1] = false;
                             }
                             else{
-                                top_edit.setText("30");
-                                btm_edit.setText("100");
-                                speed_edit.setText("20");
+                                top_edit.setText("10");
+                                btm_edit.setText("25");
+                                speed_edit.setText("100");
                                 setButtonActive(button);
                                 enableSeekbar();
                                 cycle_edit.setEnabled(true);

@@ -7,7 +7,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -23,8 +25,8 @@ import java.sql.Array;
 public class OneOnOne extends AppCompatActivity {
     private EditText title;
     private EditText content;
-    private Button inquire;
-    private Button back;
+    private TextView inquire;
+    private ImageButton back;
     private Spinner category;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;

@@ -32,13 +32,16 @@
         android:layout_marginTop="215dp"
         android:background="@drawable/rectangle"/>
 
-    <Button
+    <TextView
         android:id="@+id/inquire"
-        android:layout_width="425dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="66dp"
         android:layout_gravity="bottom"
-        android:layout_weight="1"
-        android:text="문의하기" />
+        android:background="#74E185"
+        android:gravity="center"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:text="운영진에게 문의하기" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -145,7 +148,7 @@
         <EditText
             android:id="@+id/content"
             android:layout_width="match_parent"
-            android:layout_height="240dp"
+            android:layout_height="220dp"
             android:background="@drawable/rectangle"
             android:gravity="top"
             android:hint="의견을 입력해주세요"
